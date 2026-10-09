@@ -1,0 +1,37 @@
+/* ================= BREADCRUMBS ================= */
+
+.breadcrumbs {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 20px 0;
+}
+
+.breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    color: #777;
+}
+
+.breadcrumbs a {
+    color: #777;
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    color: #264ea0;
+    text-decoration: underline;
+}
+
+.breadcrumbs [aria-current="page"] {
+    color: #264ea0;
+    font-weight: 500;
+}

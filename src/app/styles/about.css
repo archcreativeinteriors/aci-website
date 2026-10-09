@@ -1,0 +1,336 @@
+.about {
+    padding: 80px 40px;
+    /* No background: the page canvas gradient (globals.css) shows through.
+       Was an opaque warm off-white, which hid the canvas on this route. */
+}
+
+.about-top {
+    text-align: center;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* Scoped to the LABEL span. This is the shared .secEyebrow now, whose
+   second span is the rule line — it paints itself with currentColor, so
+   a `color` here would have turned it grey. */
+.about-top .secEyebrow > span:first-child {
+    letter-spacing: 4px;
+}
+
+.about-top h2,
+/* One clamp, not a 64/54/46/36/30 step list. Those steps crossed BELOW
+   the section heading's 34px floor at phone width, so on /about at 375px
+   the page title rendered 30px under 34px section headings — visible only
+   at that viewport. 42>34, 6vw>4.4vw, 72>64 holds everywhere. */
+.about-top h1 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(42px, 6vw, 72px);
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-top: 25px;
+    color: var(--heading-ink);
+    font-weight: 400;
+}
+
+.about-grid {
+    max-width: 1300px;
+    margin: 100px auto;
+
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 100px;
+    align-items: center;
+}
+
+.about-image {
+    position: relative;
+    height: 440px;
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.about-image img {
+    transition: transform 1s ease;
+}
+
+.about-image:hover img {
+    transform: scale(1.05);
+}
+
+.about-content h3 {
+    font-size: 42px;
+    margin-bottom: 25px;
+    font-weight: 500;
+    color: #111;
+}
+
+/* The page intro heading. Split out of the shared h2+h3 rule above when
+   every section heading moved to the Where-we-build treatment (owner,
+   2026-09-17). The h3 in this block is the step title and the stat
+   counter, which are NOT section headings and keep their own size at
+   every breakpoint. Values match .secHead h2; the clamp replaces the
+   42/36/34/28 steps this selector used to carry, so the h2 no longer
+   appears in the media queries at all. */
+.about-content h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    margin-bottom: 25px;
+}
+
+.about-content p {
+    font-size: 16px;
+    line-height: 2;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.about-stats {
+    max-width: 1200px;
+    margin: auto;
+
+    display: grid;
+    /* THREE stats now, matching the home hero — the project total was removed
+       site-wide on 2026-09-17 and the "Documented" tile went with it.
+
+       Steps 3 -> 2 -> 2, never to a single column: full-width blue cards at
+       50px padding eat most of a phone screen when stacked. Three items in a
+       two-column grid would leave an orphan in the second row, so the first
+       tile spans both columns inside the breakpoints below — which also gives
+       "1000+ Spaces delivered" the prominence it should have anyway.
+
+       If a tile is added or removed, this rule AND both breakpoint overrides
+       have to move with it. The home hero's equivalent row is flex-wrap and
+       needs no such maintenance; this one is an explicit column count. */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.stat {
+    background: #264ea0;
+    padding: 50px;
+
+    border-radius: 24px;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.04);
+}
+
+.stat h3,
+.stat h4 {
+    font-size: 52px;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* DIRECT CHILD, deliberately. The figure is a <span class="statCount"> inside
+   the <h3>, so a descendant ".stat span" (0,1,1) also matched it and, being
+   later in the file than ".stat h3" (also 0,1,1), won on source order — the
+   52px number rendered at this label's 14px. Every stylesheet here is global;
+   CLAUDE.md Phase 21.6 records the same trap with ".projects-header span". */
+.stat > span {
+    color: #ffffffdc;
+    font-size: 14px;
+}
+
+/* ================= LARGE LAPTOP ================= */
+
+@media (max-width: 1200px) {
+
+    .about {
+        padding: 80px 30px;
+    }
+
+    .about-top h2,
+
+    .about-grid {
+        gap: 60px;
+    }
+
+    .about-image img {
+        height: 600px;
+    }
+
+    .about-content h3 {
+        font-size: 36px;
+    }
+
+    .stat {
+        padding: 40px;
+    }
+}
+
+/* ================= TABLET ================= */
+
+@media (max-width: 992px) {
+
+    .about {
+        padding: 70px 25px;
+    }
+
+    .about-top h2,
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        margin: 70px auto;
+    }
+
+    .about-image {
+        order: -1;
+    }
+
+    .about-image img {
+        height: 500px;
+    }
+
+    .about-content {
+        text-align: center;
+    }
+
+    .about-content h3 {
+        font-size: 34px;
+    }
+
+    .about-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* Three tiles in two columns leaves one alone in row 2. Span the first
+       across both instead: no orphan, and the headline figure leads. */
+    .about-stats .stat:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .stat {
+        padding: 30px 20px;
+    }
+
+    .stat h3,
+.stat h4 {
+        font-size: 42px;
+    }
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+    .about {
+        padding: 60px 20px;
+    }
+
+    .about-top h2,
+
+    .about-top .secEyebrow > span:first-child {
+        letter-spacing: 3px;
+    }
+
+    .about-grid {
+        margin: 50px auto;
+        gap: 40px;
+    }
+
+    .about-image {
+        border-radius: 22px;
+    }
+
+    .about-image img {
+        height: 380px;
+    }
+
+    .about-content h3 {
+        font-size: 28px;
+        line-height: 1.3;
+    }
+
+    .about-content p {
+        font-size: 15px;
+        line-height: 1.9;
+    }
+
+    .about-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* Three tiles in two columns leaves one alone in row 2. Span the first
+       across both instead: no orphan, and the headline figure leads. */
+    .about-stats .stat:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .stat {
+        padding: 35px 25px;
+        border-radius: 20px;
+    }
+
+    .stat h3,
+.stat h4 {
+        font-size: 40px;
+    }
+
+    .stat > span {
+        font-size: 13px;
+    }
+}
+
+/* ================= SMALL MOBILE ================= */
+
+@media (max-width: 480px) {
+
+    .about {
+        padding: 50px 16px;
+    }
+
+    .about-top h2,
+
+    .about-grid {
+        margin: 40px auto;
+        gap: 30px;
+    }
+
+    .about-image {
+        border-radius: 18px;
+    }
+
+    .about-image img {
+        height: 300px;
+    }
+
+    .about-content h3 {
+        font-size: 20px;
+    }
+
+    .about-content p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    /* Was display:flex + .stat{width:30%} — built for three cards, and with
+       four that overflows the row. Stays a 2x2 grid at phone width. */
+    .about-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+
+    .stat {
+        padding: 28px 20px;
+    }
+
+    .stat h3,
+.stat h4 {
+        font-size: 24px;
+    }
+
+    .stat > span {
+        font-size: 12px;
+    }
+}

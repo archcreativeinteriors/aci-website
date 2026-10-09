@@ -1,0 +1,145 @@
+/* =========================================================
+   Brand page "By format" cards — components/brand/
+   BrandFormatBreakdown.jsx. Every selector is prefixed `bf-`.
+   The look matches the home brand tiles (brand-tiles.css):
+   photo blurred under a navy wash at rest, sharp and gently
+   zoomed on hover / focus, name on a frosted glass strip.
+   The old `.bfmtBars` rules in brand-page.css are unused now.
+   ========================================================= */
+
+.bf-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.bf-item {
+    display: flex;
+    min-width: 0;
+}
+
+.bf-card {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    border-radius: 16px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    /* The placeholder for a format with no photograph: a soft navy tint. */
+    background: linear-gradient(160deg, #2b4a8f 0%, var(--heading-ink) 100%);
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.bf-card *,
+.bf-card *::before,
+.bf-card *::after {
+    box-sizing: border-box;
+}
+
+.bf-card__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    object-fit: cover;
+    filter: blur(4px) saturate(.8) brightness(.9);
+    transform: scale(1.12); /* hides the blurred edges */
+    transition: filter .6s ease, transform .9s cubic-bezier(.2, .7, .2, 1);
+}
+
+/* No photograph of this format: BrandPlaceholder sits where the photo would,
+   behind the shade and the glass strip. */
+.bf-card__ph {
+    z-index: -2;
+}
+
+.bf-card__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to top,
+            rgba(12, 24, 64, .85) 0%,
+            rgba(12, 24, 64, .35) 55%,
+            rgba(12, 24, 64, .5) 100%);
+    transition: opacity .5s ease;
+}
+
+.bf-card:hover .bf-card__bg,
+.bf-card:focus-visible .bf-card__bg {
+    filter: blur(0) saturate(1.05) brightness(1);
+    transform: scale(1.04);
+}
+
+.bf-card:hover .bf-card__shade,
+.bf-card:focus-visible .bf-card__shade {
+    opacity: .6;
+}
+
+.bf-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 32px -18px rgba(15, 26, 58, .6);
+}
+
+.bf-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.bf-card__glass {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .22);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+}
+
+.bf-card__name {
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: 1.35rem;
+    line-height: 1.15;
+}
+
+.bf-card__line {
+    font-size: .8rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, .82);
+}
+
+/* Touch screens have no hover: keep the photo mostly in focus. */
+@media (hover: none) {
+    .bf-card__bg {
+        filter: blur(1.5px) saturate(.95);
+    }
+
+    .bf-card:hover {
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bf-card,
+    .bf-card__bg,
+    .bf-card__shade {
+        transition: none;
+    }
+
+    .bf-card:hover {
+        transform: none;
+    }
+}

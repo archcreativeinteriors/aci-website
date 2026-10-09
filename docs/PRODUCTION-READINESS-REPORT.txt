@@ -1,0 +1,393 @@
+===============================================================================
+ARCH CREATIVE INTERIORS - PRODUCTION READINESS AUDIT
+===============================================================================
+
+Site        : archcreativeinteriors.com
+Stack       : Next.js 16.2.4 (App Router) / React 19.2.4 / Node >= 20.9
+Deployment  : self-managed Ubuntu VPS (DigitalOcean BLR1), nginx -> next start
+Repository  : https://github.com/archcreativeinteriors/aci-website
+HEAD        : ce9424d   Branch: phase-1-critical-bugs
+Audited     : 11 September 2026
+Scope       : the live deployment AND the 456 uncommitted changes in the tree
+
+Nothing was modified, deleted, deployed, uploaded or migrated to produce this
+report. All measurements were taken read-only.
+
+
+-------------------------------------------------------------------------------
+VERDICT - NOT READY TO DEPLOY
+-------------------------------------------------------------------------------
+
+The application itself is in good shape. The build is green, all 58 routes pass
+structural QA, every internal link resolves, and SEO is complete.
+
+What blocks a deploy is not code quality. It is one live brand-damaging content
+defect, a framework with an unpatched RCE advisory that this config activates,
+and the fact that none of the work exists anywhere but one disk.
+
+Two of the four blockers already affect the live site. They do not require a
+deploy to fix - they require a decision.
+
+    BLOCKERS ........  4
+    HIGH ............  6
+    MEDIUM ..........  5
+    VERIFIED CLEAN ..  9
+
+
+===============================================================================
+BLOCKERS
+===============================================================================
+
+-------------------------------------------------------------------------------
+B1  21 of 34 project photographs carry a third-party trial watermark
+    [LIVE NOW]  [CONTENT]
+-------------------------------------------------------------------------------
+
+A banner reading "Protected with trial version of Visual Watermark. Full
+version doesn't put this mark." runs along the bottom edge of 21 of the 34
+photographs the site displays. This is on the live site today, on the detail
+pages of the studio's flagship work.
+
+    watermarked ................................... 21 / 34
+    clean ......................................... 13 / 34
+    clean originals recoverable from archive ......  3
+    unrecoverable - owner's originals required .... 18
+
+Determined two ways: visual inspection of the bottom strip of all 34 files, and
+a horizontal-gradient detector that separated 19 of 21 cleanly with no false
+negatives. The two it missed were confirmed at full resolution.
+
+The companion sanity-project-manifest.csv originally recorded this as 26 stamped
+/ 8 clean and named the wrong files - 7 of the 8 it called clean are stamped.
+That has been corrected. Acting on the original list would have re-shot
+photographs that were already fine.
+
+FIX: three files can be swapped from the recovered archive immediately. The
+other 18 need the owner's pre-watermark originals - they exist in no repository,
+archive, or git revision.
+
+
+-------------------------------------------------------------------------------
+B2  Next.js 16.2.4 is inside the vulnerable range, and AVIF is enabled
+    [LIVE NOW]  [SECURITY]
+-------------------------------------------------------------------------------
+
+npm audit reports 3 production vulnerabilities, one critical. The affected range
+is 9.3.4-canary.0 - 16.3.2; the installed version is 16.2.4.
+
+    GHSA-2xp9-vwfh-vxw4  RCE in Image Optimization API when AVIF is used
+    GHSA-c4j6-fc7j-m34r  SSRF via WebSocket upgrades            CVSS 8.6
+    GHSA-492v-c6pp-mqqv  Middleware bypass, route param injection  CVSS 8.1
+    GHSA-h64f-5h5j-jqjh  DoS in Image Optimization API           CVSS 5.9
+
+The first matters most here because it is not hypothetical for this config:
+next.config.mjs sets formats: ["image/avif", "image/webp"], so the AVIF path is
+active on every optimized image on the site.
+
+NOT APPLICABLE: the CVSS 9.0 advisory in this set is an unauthenticated RCE on
+Windows-hosted servers. Deployment is Ubuntu, so that one does not apply - worth
+stating plainly, because the headline "critical" severity comes largely from it.
+
+Also flagged by npm audit (both high, both build-time rather than request-path):
+    postcss  <= 8.5.22        arbitrary .map file read via sourceMappingURL
+    sharp    <= 0.35.4-rc.0   inherited libvips / libheif CVEs
+
+FIX: upgrade to next@16.3.4 (latest; first patched release is 16.3.3). A minor
+move within 16.x, but the build is the only gate this project has - re-run the
+full 58-route sweep afterwards.
+
+
+-------------------------------------------------------------------------------
+B3  456 uncommitted changes with no restore point anywhere
+    [WORKING TREE]  [OPERATIONAL RISK]
+-------------------------------------------------------------------------------
+
+Every change made across this and previous sessions exists only as modified
+files on one machine. Nothing is committed, nothing is pushed, and the branch
+created for the work has no commits on it.
+
+    modified .... 168
+    deleted ..... 232
+    untracked ...  56
+
+    main                   ce9424d  [origin/main]
+    phase-1-critical-bugs  ce9424d  (no upstream, no commits)
+
+The untracked set is not incidental. It includes lib/site.js,
+lib/projectSource.js, robots.js, sitemap.js, not-found.js, the entire sanity/
+layer, and the privacy-policy/, terms/ and contact/ routes - files git has never
+seen in any revision.
+
+A disk failure, a bad git checkout, or an editor mishap loses all of it. This is
+the cheapest blocker to close and the most expensive to leave open.
+
+FIX: commit to phase-1-critical-bugs and push with -u. No deploy required - the
+branch is not main, so pushing it changes nothing about the live site.
+
+
+-------------------------------------------------------------------------------
+B4  The Resend API key was exposed and has not been rotated
+    [LIVE NOW]  [CREDENTIALS]
+-------------------------------------------------------------------------------
+
+The key was shared inside an archive and confirmed earlier as live and
+unrotated. It is the credential that sends every contact-form enquiry.
+
+Verified good news alongside it: it was NEVER COMMITTED. All 86 commits were
+scanned for a "re_" pattern with zero hits, and .gitignore carries .env* with an
+!.env.example negation, so it cannot be committed by accident. The exposure was
+the archive, not the repository.
+
+FIX: rotate in the Resend dashboard and update .env.local on the VPS. May need
+the teammate whose Resend account owns the key.
+
+
+===============================================================================
+HIGH
+===============================================================================
+
+-------------------------------------------------------------------------------
+H1  No security headers are set by the application
+    [LIVE NOW]  [SECURITY]
+-------------------------------------------------------------------------------
+
+next.config.mjs has no headers() block at all. Its only keys are images and
+redirects. Nothing sets Content-Security-Policy, Strict-Transport-Security,
+X-Frame-Options, X-Content-Type-Options or Referrer-Policy, and poweredByHeader
+is not disabled, so every response advertises X-Powered-By: Next.js.
+
+These may be set in nginx instead. That config is on the server and outside this
+repository, so this audit CANNOT confirm either way.
+
+    ==> CHECK THE NGINX CONFIG BEFORE TREATING THIS AS OPEN OR CLOSED.
+
+
+-------------------------------------------------------------------------------
+H2  No error boundary - a render error falls through to Next's default page
+    [LIVE NOW]  [RESILIENCE]
+-------------------------------------------------------------------------------
+
+There is no error.js or global-error.js anywhere in src/app. A custom 404 exists
+and is correct, but an uncaught exception during render has nothing to catch it,
+so a visitor gets the framework's generic error screen with no navigation back
+into the site.
+
+
+-------------------------------------------------------------------------------
+H3  No working analytics, and a 404 on every page load
+    [LIVE NOW]  [OBSERVABILITY]
+-------------------------------------------------------------------------------
+
+@vercel/analytics is mounted in layout.js, but the site runs on a VPS behind
+nginx, not on Vercel. The component requests /_vercel/insights/script.js, which
+nothing serves.
+
+    Lighthouse errors-in-console:  404  /_vercel/insights/script.js
+
+Confirmed empirically, not inferred. The owner has chosen to keep the component
+mounted so it activates on the planned Vercel migration - a defensible call, but
+it means there is NO TRAFFIC DATA AT ALL today, and no error tracking of any
+kind alongside it.
+
+
+-------------------------------------------------------------------------------
+H4  Contact form delivery has never been confirmed end to end
+    [WORKING TREE]  [DELIVERY]
+-------------------------------------------------------------------------------
+
+The route is well hardened - server-side validation, HTML-escaped interpolation,
+a honeypot, and a 5-per-IP-per-10-minute rate limit returning 429. A live send
+returned HTTP 200.
+
+200 proves Resend ACCEPTED the message, not that it ARRIVED. Nobody has
+confirmed the business inbox received it.
+
+This is the site's only conversion path. Every enquiry the studio receives
+depends on it.
+
+Note: the rate limit is an in-memory Map, correct for THIS deployment only (one
+long-lived next start process). On Vercel it degrades to per-instance and is
+close to no limit.
+
+
+-------------------------------------------------------------------------------
+H5  No CI, no tests, no linter - the build is the only gate
+    [WORKING TREE]  [PROCESS]
+-------------------------------------------------------------------------------
+
+There is no .github/workflows, no test files, and no ESLint config. Deployment
+is manual: git pull && npm ci && npm run build, then a process restart.
+
+The practical consequence is visible in this audit's own findings: a green build
+did not catch a stylesheet referencing a deleted image, or ten detail pages
+linking to brand pages that no longer existed.
+
+    ==> A PASSING BUILD MEANS IT COMPILED, NOT THAT IT WORKS.
+
+
+-------------------------------------------------------------------------------
+H6  No "engines" field despite a documented Node floor
+    [WORKING TREE]  [DEPLOY]
+-------------------------------------------------------------------------------
+
+CLAUDE.md states Node >= 20.9, but package.json declares no engines. Nothing
+stops the VPS - or a future Vercel build - from running an older runtime and
+failing in a way that points somewhere unhelpful.
+
+
+===============================================================================
+MEDIUM
+===============================================================================
+
+-------------------------------------------------------------------------------
+M1  Placeholder data is visible on the live site   [LIVE NOW]  [DATA]
+-------------------------------------------------------------------------------
+
+    projects with year: "2025" - placeholder, not real ..... 34 / 34
+    "Photograph to be shot" placeholders rendered ..........  8
+    "Completed: To be confirmed" rows ......................  1
+    "1000+" volume claims against 192 documented projects ..  4
+
+The design handles these honestly - the site says "To be confirmed" rather than
+inventing a date, and year headings stay switched off until real years exist.
+But the underlying data is still placeholder, and a single filled column turns
+several features on by itself.
+
+
+-------------------------------------------------------------------------------
+M2  Legal pages strengthened but never reviewed, two fields open
+    [WORKING TREE]  [LEGAL]
+-------------------------------------------------------------------------------
+
+Both pages are more complete than "draft" suggests. Two items are deliberately
+unresolved and marked inline in the source:
+
+  - the 24-month RETENTION PERIOD, written as a concrete commitment because DPDP
+    expects one. The business has to actually keep it. Confirm or change it.
+  - the GRIEVANCE OFFICER'S NAME, left blank rather than assigning a legal role
+    to a named person without authorisation.
+
+Google and Meta both require a reachable privacy policy before approving paid
+campaigns, so this gates advertising, not deployment.
+
+
+-------------------------------------------------------------------------------
+M3  A 260 MB .git against a 22 MB public/   [WORKING TREE]  [REPOSITORY]
+-------------------------------------------------------------------------------
+
+Image blobs are roughly 95% of history - 24-megapixel originals only ever shrunk
+in the working tree, with each re-encoding pass adding a fresh copy. 86 commits,
+one committer, nothing pushed since.
+
+A git filter-repo pass would bring it to roughly 25 MB. The precondition that
+matters:
+
+    ==> DEPLOYMENT IS "git pull" ON THE VPS, SO AFTER THE FORCE-PUSH THE SERVER
+        MUST BE RE-CLONED, NOT PULLED.
+
+Do it before the Sanity migration, not after.
+
+
+-------------------------------------------------------------------------------
+M4  Accessibility at 93 - two audits failing   [LIVE NOW]  [ACCESSIBILITY]
+-------------------------------------------------------------------------------
+
+  color-contrast  fails on the brand-tile captions (.tN)
+  target-size     fails on the footer contact links - 17px tall vs 24px minimum
+
+Both predate this audit's changes.
+
+
+-------------------------------------------------------------------------------
+M5  Mobile weight is image weight, and code cannot fix it
+    [LIVE NOW]  [PERFORMANCE]
+-------------------------------------------------------------------------------
+
+The sources are 1500x2000 photographs. Earlier work measured the ceiling for a
+config-level fix at about 4 points of Lighthouse score. The remaining flags are
+uses-responsive-images and dom-size on the 192-row index, which is the design
+working as intended. This resolves with the Sanity CDN migration, not in this
+codebase.
+
+
+===============================================================================
+VERIFIED CLEAN
+===============================================================================
+
+Measured against a confirmed production server - 0 next-devtools markers - not a
+dev server. That check exists because this exact mistake was made once before
+and produced numbers off by roughly a factor of two.
+
+    [OK]  Build .................. exit 0, 59 pages prerendered
+    [OK]  58 routes .............. one <h1> each, zero heading skips
+    [OK]  56 internal links ...... 0 non-200
+    [OK]  137 image sources ...... 0 broken
+    [OK]  SEO .................... 100 across every page sampled
+    [OK]  CLS .................... 0 on every route measured
+    [OK]  Desktop performance .... 98, LCP 1.2 s
+    [OK]  Metadata ............... complete on all 14 route files
+    [OK]  Secrets ................ none in any of 86 commits
+
+Also verified: contact API hardened (validation, HTML-escaped interpolation,
+honeypot, rate limit), .env* correctly gitignored with an !.env.example
+negation, zero console.log statements in src/, and all 82 client logos carrying
+real alt text.
+
+
+===============================================================================
+ORDER OF WORK
+===============================================================================
+
+Sequenced by risk removed per unit of effort, not by severity. The first step
+costs minutes and protects everything after it.
+
+  1. Commit and push the working tree to phase-1-critical-bugs.
+     Closes B3. Touches nothing live.
+
+  2. Rotate the Resend key.                          [NEEDS OWNER]
+     Closes B4.
+
+  3. Confirm a test enquiry actually arrives.        [NEEDS OWNER]
+     Closes H4.
+
+  4. Upgrade to next@16.3.4, then re-run the build and the 58-route sweep.
+     Closes B2.
+
+  5. Check nginx for security headers; add a headers() block only for whatever
+     is missing there.
+     Resolves H1.
+
+  6. Add global-error.js and an engines field.
+     Closes H2 and H6.
+
+  7. Supply 18 clean photographs.                    [NEEDS OWNER]
+     Closes B1 - the only blocker with no technical path.
+
+  8. Then deploy, and only then consider the history rewrite and the Sanity
+     migration.
+
+
+===============================================================================
+METHOD AND LIMITS
+===============================================================================
+
+Every figure here was measured from the repository or from a production server
+on port 3100 during this audit. Port 3000 was occupied by a dev server and was
+deliberately left untouched.
+
+Lighthouse runs used version 13.4.1 with standard mobile throttling.
+
+ONE CAUTION ON COMPARISONS
+Mobile performance measured 92 in this run against 80 recorded earlier. Nothing
+in the recent changes can move LCP - that delta is Lighthouse version and
+machine load, not an improvement. The two runs are not comparable and should not
+be reported as progress.
+
+OUT OF SCOPE
+The nginx configuration, TLS setup, DNS, server hardening, backups and process
+supervision all live on the VPS and were not inspected. H1 in particular cannot
+be closed from inside this repository.
+
+===============================================================================
+END OF REPORT
+===============================================================================

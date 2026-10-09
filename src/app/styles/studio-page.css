@@ -1,0 +1,341 @@
+/* ================= ABOUT PAGE SECTIONS =================
+   Founder, "How a project runs", the team and the FAQ on /about.
+
+   The file is still named studio-page.css and the classes are still sd-prefixed
+   because this was /studio until that page was merged into /about (which now
+   308s from /studio). Renaming both would touch every selector for no
+   behavioural gain; the prefix's real job is collision avoidance, not naming.
+
+   Every class is prefixed "sd". All ~30 stylesheets load globally on every
+   route, and the reference demo's own names collide with what is already here:
+   ".faq" is faq.css's section wrapper and ".step-*" is how-we-work.css.
+   Copying the demo's class names forward would have silently restyled two
+   other components.
+
+   The old .sdHero / .sdCrumb / .sdStat rules went with the merge — /about
+   opens with its own .about-top block. The .sdHero grid rule in the 1000px
+   block below went with them. */
+
+/* ---- founder ---- */
+.sdName {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+}
+
+/* Uppercase and tracked, the way the About page's Founder block sets it — the
+   two render the same person and should not look like two different people. */
+.sdRole {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+}
+
+/* The quote is the founder's own line, not body copy — it carries the block.
+   `font-style: normal` is load-bearing: this label sits INSIDE the italic
+   <blockquote> and inherited the slant, so "IN HIS WORDS" rendered italic
+   alongside the quote instead of reading as a label above it. */
+.sdQuoteMark {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.sdPara {
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 52ch;
+}
+
+.sdPara + .sdPara {
+    margin-top: 14px;
+}
+
+.sdQuote {
+    margin-top: 26px;
+    padding-left: 20px;
+    border-left: 2px solid var(--primary);
+    font-size: 18px;
+    line-height: 1.6;
+    font-style: italic;
+    color: var(--text);
+    max-width: 52ch;
+}
+
+/* ---- how a project runs (demo .steps) ---- */
+.sdSteps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+}
+
+.sdStep {
+    padding: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+
+.sdStep:hover {
+    border-color: var(--primary);
+    box-shadow: var(--sh-soft);
+}
+
+.sdStepN {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.sdStep h3 {
+    font-size: 17px;
+    font-weight: 500;
+    margin: 8px 0;
+}
+
+.sdStep p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+}
+
+/* ---- the team (demo .grid4) ---- */
+.sdGrid4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s2);
+}
+
+/* home.css's .frame is 4/3 for project photography. These are portraits. */
+.sdGrid4 .frame {
+    aspect-ratio: 4 / 5;
+}
+
+/* ---- common questions ----
+   <details>/<summary>, not a JS accordion. The demo's version is
+   `display:none` until a click handler adds `.open`, which would hide every
+   answer from a reader without JS and from anything reading the SSR HTML.
+   Project rule (Phase 10.11): never gate content visibility on client JS. */
+/* ================= COMMON QUESTIONS =================
+   Still <details>/<summary>. Everything here is PRESENTATION: the accordion
+   opens and closes with no JavaScript, every answer is in the SSR HTML, and the
+   FAQPage schema on this page stays honest. The useState accordion this design
+   came from would have broken all three (CLAUDE.md Phase 10.11 / 14.4).
+
+   One-open-at-a-time comes from the `name` attribute on <details>, natively
+   (Chrome 120+, Safari 17.2+, Firefox 130+). An older browser just allows more
+   than one open at once - a degradation, not a break. */
+.sdFaqList {
+    max-width: 760px;
+    border-top: 1px solid var(--border);
+}
+
+.sdFaq {
+    border-bottom: 1px solid var(--border);
+    border-left: 8px solid var(--border);
+    background: transparent;
+    transition: border-left-color .25s var(--ease), background .25s var(--ease);
+}
+
+.sdFaq:hover {
+    border-left-color: var(--muted);
+    background: rgba(38, 78, 160, .03);
+}
+
+.sdFaq[open] {
+    border-left-color: var(--primary);
+    background: rgba(38, 78, 160, .06);
+}
+
+.sdFaqQ {
+    position: relative;
+    width: 100%;
+    min-height: 60px;
+    /* room for the icon on the left and the chevron on the right */
+    padding: 20px 52px 20px 56px;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+    transition: color .2s var(--ease);
+}
+
+.sdFaqQ::-webkit-details-marker {
+    display: none;
+}
+
+.sdFaqQ:hover {
+    color: var(--text);
+}
+
+.sdFaq[open] .sdFaqQ {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* <summary> is the focus target; it must keep a visible ring. */
+.sdFaqQ:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -3px;
+}
+
+/* "+" that becomes "-": two bars, the upright one scales away. DRAWN, not
+   typed, so it animates and so a screen reader never reads the glyph as
+   punctuation in the middle of the question. */
+.sdFaqIcon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    transform: translateY(-50%);
+    color: var(--muted);
+    transition: color .25s var(--ease);
+}
+
+.sdFaq[open] .sdFaqIcon {
+    color: var(--primary);
+}
+
+.sdFaqIcon::before,
+.sdFaqIcon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: currentColor;
+    border-radius: 1px;
+}
+
+.sdFaqIcon::before {
+    width: 16px;
+    height: 2px;
+    transform: translate(-50%, -50%);
+}
+
+.sdFaqIcon::after {
+    width: 2px;
+    height: 16px;
+    transform: translate(-50%, -50%);
+    transition: transform .25s var(--ease);
+}
+
+.sdFaq[open] .sdFaqIcon::after {
+    transform: translate(-50%, -50%) scaleY(0);
+}
+
+.sdFaqChev {
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 3px solid var(--muted);
+    border-right: 3px solid var(--muted);
+    transform: translateY(-65%) rotate(133deg);
+    transition: transform .25s var(--ease), border-color .25s var(--ease);
+}
+
+.sdFaq[open] .sdFaqChev {
+    border-color: var(--primary);
+    transform: translateY(-30%) rotate(-44deg);
+}
+
+.sdFaqA {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--muted);
+    padding: 2px 52px 24px 56px;
+    max-width: 64ch;
+}
+
+/* The smooth expand, where the browser can do it WITHOUT script.
+   ::details-content + interpolate-size is Chrome/Edge 131+; everywhere else the
+   panel opens instantly and every style above still applies. This is the only
+   way to animate <details> without JS, and staying JS-free is the whole point. */
+@supports (interpolate-size: allow-keywords) {
+    .sdFaqList {
+        interpolate-size: allow-keywords;
+    }
+
+    .sdFaq::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition:
+            block-size .32s var(--ease),
+            content-visibility .32s allow-discrete;
+    }
+
+    .sdFaq[open]::details-content {
+        block-size: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .sdFaq,
+    .sdFaqQ,
+    .sdFaqIcon,
+    .sdFaqIcon::after,
+    .sdFaqChev,
+    .sdFaq::details-content {
+        transition: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .sdFaq {
+        border-left-width: 6px;
+    }
+
+    .sdFaqQ {
+        padding: 18px 40px 18px 46px;
+        font-size: 16px;
+    }
+
+    .sdFaqA {
+        padding: 2px 20px 20px 46px;
+    }
+
+    .sdFaqIcon {
+        left: 16px;
+    }
+
+    .sdFaqChev {
+        right: 16px;
+    }
+}
+
+
+.sdFaqFoot {
+    margin-top: var(--s3);
+}
+
+
+
+/* ---- breakpoints (demo: 2-up at 1000, 1-up at 700) ---- */
+@media (max-width: 1000px) {
+
+    .sdSteps,
+    .sdGrid4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .sdSteps,
+    .sdGrid4 {
+        grid-template-columns: 1fr;
+    }
+}

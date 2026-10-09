@@ -1,0 +1,338 @@
+/* ================= FOOTER =================
+   Four columns: brand · Explore · Studio (NAP) · map, then a full-bleed bottom
+   strip.
+
+   COLOUR: brand blue, bookending the header. The page opens with a
+   --primary-dark topbar above a --primary nav; it now closes with a --primary
+   body above a --primary-dark strip. Same two colours, mirrored.
+
+   The LAYOUT is the CTA band's (`.ctaBand` in home.css) — translucent white
+   panel for the map, 12px uppercase micro-headings, the white `.bWhite` pill.
+   The ALPHAS are not, and deliberately so: .ctaBand sits on --surface (#151515)
+   where white at .5 still reads; on this mid-blue the same value drops to
+   ~3.2:1 and fails AA. Muted text here is .7 (4.75:1) and panels are .08/.20
+   rather than .06/.14. **Do not "unify" the two sets — they are different
+   because the grounds are.**
+
+   Container is 1280px, matching .wrapx, so the footer lines up with every
+   section above it. */
+
+.footer {
+    background: var(--primary);
+    color: #fff;
+}
+
+.footer-content {
+    max-width: 1280px;
+    margin: auto;
+    padding: 72px 20px 0;
+}
+
+/* ================= GRID ================= */
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1.35fr 1.3fr;
+    gap: 48px 40px;
+    padding-bottom: 52px;
+}
+
+/* ================= BRAND ================= */
+
+.footer-logo {
+    height: 44px;
+    width: auto;
+}
+
+.footer-tagline {
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, .78);
+    max-width: 34ch;
+}
+
+.footer-social {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.footer-social a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #fff;
+    background: rgba(255, 255, 255, .08);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .2);
+    transition: background-color .25s var(--ease), border-color .25s var(--ease),
+        color .25s var(--ease), transform .25s var(--ease);
+}
+
+.footer-social a:hover {
+    background: #fff;
+    border-color: #fff;
+    color: var(--primary);
+    transform: translateY(-3px);
+}
+
+/* ================= COLUMN HEADINGS =================
+   Shape matches .ctaBand-cardHead; alpha is raised for the blue ground. */
+
+.footer-heading {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .72);
+    margin-bottom: 20px;
+}
+
+/* ================= LINKS ================= */
+
+.footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links a {
+    font-size: 15px;
+    color: #fff;
+    text-decoration: none;
+    transition: opacity .25s var(--ease), transform .25s var(--ease);
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    opacity: .72;
+    transform: translateX(3px);
+}
+
+/* ================= NAP =================
+   Row shape copied from .ctaBand-channels: 15px icon, white text, 12px gap,
+   aligned to the first line of a wrapping block. */
+
+.footer-info {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-info li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: #fff;
+}
+
+.footer-info li > svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: rgba(255, 255, 255, .6);
+}
+
+.footer-info a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer-info a:hover {
+    text-decoration: underline;
+}
+
+/* Both call numbers, one per line (owner, 2026-10-07). */
+.footer-phones {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ================= MAP ================= */
+
+.footer-mapcard {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: var(--r-card);
+    padding: 10px;
+}
+
+.footer-map {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: calc(var(--r-card) - 10px);
+    overflow: hidden;
+    background: rgba(255, 255, 255, .08);
+}
+
+/* The iframe and the consent placeholder that stands in for it share ONE box
+   rule, so swapping the real map in can never shift the layout. Add any new
+   geometry here, not to .mapGate in cookie-consent.css. */
+.footer-map iframe,
+.footer-map .mapGate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.footer-map iframe {
+    border: 0;
+    display: block;
+}
+
+/* Matches .bWhite. */
+.footer-directions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 14px 30px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: #fff;
+    border-radius: var(--r-btn);
+    text-decoration: none;
+    transition: transform .2s var(--ease), box-shadow .25s;
+}
+
+.footer-directions:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-deep);
+}
+
+.footer-directions span {
+    transition: transform .25s var(--ease);
+}
+
+.footer-directions:hover span {
+    transform: translateX(3px);
+}
+
+/* ================= BOTTOM STRIP =================
+   Full-bleed --primary-dark, the same colour as the header topbar. */
+
+.footer-bottom-bar {
+    background: var(--primary-dark);
+}
+
+/* THE RIGHT PADDING RESERVES THE FLOATING BUTTON TOWER'S COLUMN — it is not
+   symmetry, and it must not be trimmed back to 20px.
+
+   WhatsApp / call / email / scroll-top are `position: fixed` to the bottom
+   right of the VIEWPORT, so at the end of the document they sit on top of this
+   row. Measured across seven widths: below 1400px the last legal item lands
+   under the tower, and **at 1280px and below the WhatsApp button actually wins
+   the click** (elementFromPoint returned .whatsapp-btn, not the link) — so the
+   last item here was unreachable on 1280, 1024, 768 and 375.
+
+   Reserving the column is the fix that does not move the tower, whose four
+   files are hand-tuned per breakpoint (see the floating-buttons entry in
+   CLAUDE.md). 92px clears right:25 + a ~56px button; 78px clears right:18 + a
+   ~50px one below 600px. Re-measure both if a button is ever resized. */
+.footer-bottom {
+    max-width: 1280px;
+    margin: auto;
+    padding: 20px 92px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.footer-bottom p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, .75);
+}
+
+.footer-legal {
+    display: flex;
+    gap: 22px;
+}
+
+.footer-legal a {
+    font-size: 13px;
+    color: rgba(255, 255, 255, .75);
+    text-decoration: none;
+    transition: color .2s var(--ease);
+}
+
+.footer-legal a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* ================= BREAKPOINTS =================
+   1024 is the navbar's hamburger line; reuse it so the header and footer change
+   shape at the same width rather than at two arbitrary points. */
+
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    /* The brand blurb and the map are the two wide items — let them span. */
+    .footer-brand,
+    .footer-mapcol {
+        grid-column: 1 / -1;
+    }
+
+    .footer-map {
+        aspect-ratio: 16 / 7;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        padding: 52px 20px 0;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 34px;
+        padding-bottom: 36px;
+    }
+
+    .footer-map {
+        aspect-ratio: 4 / 3;
+    }
+
+    .footer-bottom {
+        justify-content: center;
+        text-align: center;
+        /* smaller buttons at right:18 down here — see the note on the base rule */
+        padding: 20px 78px 20px 20px;
+    }
+
+    /* §5: every tap target reaches 44px on small screens — the same rule the
+       home buttons follow. */
+    .footer-directions {
+        min-height: 44px;
+        justify-content: center;
+    }
+}
+
+/* The lift on hover sticks after a tap on touch devices. */
+@media (hover: none) {
+
+    .footer-social a:hover,
+    .footer-directions:hover,
+    .footer-links a:hover {
+        transform: none;
+    }
+}

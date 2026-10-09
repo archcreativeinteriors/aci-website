@@ -1,0 +1,344 @@
+/* ================= /clients PAGE — full logo wall ================= */
+
+.clients-page {
+    /* Soft tinted ground so the white logo cards read as cards, not as holes. */
+    background:
+        radial-gradient(900px 420px at 50% -8%, rgba(38, 78, 160, 0.09), transparent 70%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 100%);
+    padding: 78px 0 104px;
+}
+
+.clients-page-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 28px;
+}
+
+/* ================= HEADER ================= */
+
+.clients-page-header {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 54px;
+}
+
+.clients-eyebrow {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid rgba(38, 78, 160, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+
+    font-size: 11px;
+    letter-spacing: 2.6px;
+    text-transform: uppercase;
+    color: #264ea0;
+}
+
+.clients-page-header h1 {
+    margin: 20px 0 0;
+    font-size: 46px;
+    font-weight: 500;
+    line-height: 1.12;
+    color: #14203a;
+}
+
+.clients-rule {
+    width: 108px;
+    height: 2px;
+    margin: 20px auto 22px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, #264ea0, transparent);
+}
+
+.clients-page-header p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #5a6274;
+}
+
+/* ================= GRID ================= */
+
+/* 12 columns so a row of 2, 3 or 4 divides evenly — each row of the company-profile
+   PDF keeps its own density. `data-cols` is the row's length, set in clients/page.js.
+   Every row sums to exactly 12, so a row can never straddle two lines. */
+.clients-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+}
+
+.client-tile[data-cols="1"] { grid-column: span 12; }
+.client-tile[data-cols="2"] { grid-column: span 6; }
+.client-tile[data-cols="3"] { grid-column: span 4; }
+.client-tile[data-cols="4"] { grid-column: span 3; }
+
+/* Fewer logos in a row means a wider tile, so the band grows with it — otherwise
+   a 2-up row reads as two small marks marooned in big cards. */
+.client-tile[data-cols="2"] .client-logo { height: 132px; }
+.client-tile[data-cols="4"] .client-logo { height: 94px; }
+
+.client-tile[data-cols="2"] { min-height: 220px; }
+.client-tile[data-cols="4"] { min-height: 176px; padding: 20px 14px; }
+
+.client-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 196px;
+    /* Tighter side padding than top/bottom — it is the width that caps the wide
+       logos, so every px here comes straight off how big they can render. */
+    padding: 24px 22px;
+
+    background: #fff;
+    border: 1px solid rgba(20, 32, 58, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(20, 32, 58, 0.04);
+
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+/* Every logo sits in the same height band regardless of its own proportions —
+   that is what makes 82 mismatched marks read as one tidy wall. The source
+   files are trimmed of their baked-in padding (scripts/upscale-client-logos.js),
+   so "contain" here fills the band honestly instead of shrinking to fit
+   whitespace that is part of the PNG. */
+.client-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 108px;
+}
+
+.client-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.28s ease;
+}
+
+.client-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 38px rgba(38, 78, 160, 0.14);
+    border-color: rgba(38, 78, 160, 0.3);
+}
+
+.client-tile:hover .client-logo img {
+    transform: scale(1.05);
+}
+
+/* Very wide banner logos (UPS) get their own full-width row so they aren't
+   squeezed into a third of it. */
+/* Alone on a full-width row, so width is never the constraint — give the band
+   real height or the banner sits marooned in the middle of the row. */
+.client-tile--wide {
+    grid-column: 1 / -1;
+    min-height: 188px;
+}
+
+.client-tile--wide .client-logo {
+    height: 122px;
+}
+
+/* ================= "YOU CAN BE HERE" TILE ================= */
+
+.client-tile--cta {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.client-tile--cta:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.client-tile--cta a {
+    width: 100%;
+    height: 100%;
+    min-height: 172px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    text-decoration: none;
+
+    border: 2px dashed rgba(38, 78, 160, 0.4);
+    border-radius: 18px;
+    background: rgba(38, 78, 160, 0.05);
+    color: #264ea0;
+
+    transition: background 0.28s ease, border-color 0.28s ease, transform 0.28s ease,
+        box-shadow 0.28s ease;
+}
+
+.client-tile--cta a:hover {
+    background: rgba(38, 78, 160, 0.1);
+    border-color: #264ea0;
+    transform: translateY(-5px);
+    box-shadow: 0 18px 38px rgba(38, 78, 160, 0.16);
+}
+
+.client-tile--cta strong {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.client-tile--cta span {
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* NOTE: a media query adds no specificity, so every `[data-cols]` rule above has to
+   be overridden by an equally-specific `[data-cols]` rule here — plain `.client-tile`
+   would lose to it regardless of source order. */
+@media (max-width: 1024px) {
+    .clients-page-header h1 {
+        font-size: 38px;
+    }
+
+    .client-tile {
+        min-height: 168px;
+        padding: 18px 16px;
+    }
+
+    .client-logo {
+        height: 90px;
+    }
+
+    .client-tile[data-cols="2"] {
+        min-height: 190px;
+    }
+
+    .client-tile[data-cols="2"] .client-logo {
+        height: 112px;
+    }
+
+    .client-tile[data-cols="4"] {
+        min-height: 152px;
+        padding: 14px 10px;
+    }
+
+    .client-tile[data-cols="4"] .client-logo {
+        height: 78px;
+    }
+
+    .client-tile--cta a {
+        min-height: 168px;
+    }
+}
+
+@media (max-width: 768px) {
+    .clients-page {
+        padding: 54px 0 78px;
+    }
+
+    .clients-page-inner {
+        padding: 0 16px;
+    }
+
+    .clients-page-header {
+        margin-bottom: 38px;
+    }
+
+    .clients-page-header h1 {
+        font-size: 29px;
+    }
+
+    .clients-page-header p {
+        font-size: 14.5px;
+    }
+
+    .clients-rule {
+        margin: 16px auto 18px;
+    }
+
+    /* The PDF's 3- and 4-up rows are unreadable at phone width, so everything
+       collapses to a straight 2-up wall. UPS keeps its own full-width row. */
+    .clients-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .client-tile[data-cols="2"],
+    .client-tile[data-cols="3"],
+    .client-tile[data-cols="4"] {
+        grid-column: span 1;
+    }
+
+    .client-tile[data-cols="1"] {
+        grid-column: 1 / -1;
+    }
+
+    .client-tile,
+    .client-tile[data-cols="2"],
+    .client-tile[data-cols="4"] {
+        min-height: 112px;
+        padding: 10px 8px;
+        border-radius: 12px;
+    }
+
+    .client-tile[data-cols="2"] .client-logo,
+    .client-tile[data-cols="4"] .client-logo {
+        height: 68px;
+    }
+
+    .client-logo {
+        height: 68px;
+    }
+
+    .client-tile--wide {
+        min-height: 94px;
+    }
+
+    .client-tile--wide .client-logo {
+        height: 52px;
+    }
+
+    .client-tile--cta a {
+        min-height: 112px;
+        gap: 5px;
+        padding: 10px;
+        border-radius: 12px;
+        border-width: 1.5px;
+    }
+
+    .client-tile--cta strong {
+        font-size: 13px;
+    }
+
+    .client-tile--cta span {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+}
+
+/* Touch devices have no hover — keep the lift from sticking after a tap. */
+@media (hover: none) {
+    .client-tile:hover {
+        transform: none;
+        box-shadow: 0 1px 2px rgba(20, 32, 58, 0.04);
+        border-color: rgba(20, 32, 58, 0.08);
+    }
+
+    .client-tile:hover .client-logo img {
+        transform: none;
+    }
+}
+

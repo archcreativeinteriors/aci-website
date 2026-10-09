@@ -1,0 +1,13 @@
+/* ================= STAT COUNTER =================
+   Tabular figures, which is what the `tabular-nums` class did in the component
+   this was adapted from. Without them every digit carries its own advance
+   width, so the number changes width on each animation frame and visibly
+   jitters — and drags its label with it in the hero's centred column. */
+.statCount {
+    font-variant-numeric: tabular-nums;
+}
+
+/* NOTE for anyone mounting this somewhere new: .statCount is (0,1,0), so ANY
+   descendant rule on the container — ".card span", ".stat span" — outranks it
+   and will resize the figure. Scope the container's own typography rules with
+   ">" rather than raising specificity here. */

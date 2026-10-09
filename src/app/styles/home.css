@@ -1,0 +1,1649 @@
+/* ================= HOME — redesign brief §3/§4 =================
+   One file for the eight Home sections rather than one per component. They are
+   siblings of a single composition and share the §3 primitives (.sec/.secHead/
+   .card/buttons); splitting them would duplicate those in six places.
+
+   Everything here uses the §1 tokens. No second accent colour, and one raw hex
+   with a reason: `.ctaBand`'s `#E7ECF7`. `--surface-soft` (#F4F6FA) measures
+   1.08:1 against the white page — the band had no visible edge at all. This is
+   a deeper tint of the same blue-grey surface family, not a new accent. If it
+   earns a second use, promote it to a token. */
+
+/* ── shared primitives (§3.3) ───────────────────────────────────────────── */
+
+.wrapx {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--s3);
+}
+
+.sec {
+    padding: var(--s4) 0;
+}
+
+/* ── SECTION TONES ───────────────────────────────────────────────────────
+   Alternating tinted / white blocks down every multi-section page (owner,
+   2026-09-22). This REVERSES the older rule that used to sit here — "sections
+   separate with a hairline, never with background colour blocks" — so `.band`
+   below is now only for the few sections that carry no tone.
+
+   ── WHY data-tone AND NOT A CLASS, AND NOT :nth-of-type ──────────────────
+   `:nth-of-type` was the obvious choice and is WRONG here: sections are not
+   consistent siblings. On Home they are direct children of <main>, but on
+   /about `<ScrollReveal>` wraps the intro in a `<div data-reveal>`, so a
+   `main > section:nth-of-type()` rule skips it and every stripe after it
+   lands on the wrong block. Checked against the rendered DOM of all 15 page
+   types before choosing, not assumed.
+
+   An attribute also cannot collide with the ~285 global class selectors in
+   this repo, which have produced six specificity accidents so far, and it
+   matches the existing `data-flip` / `data-cols` / `data-reveal` convention.
+
+   background-COLOR, not `background`: the shorthand would wipe the
+   background-image on anything that has one. */
+[data-tone="tint"] {
+    background-color: var(--tone-tint);
+}
+
+[data-tone="plain"] {
+    background-color: var(--tone-plain);
+}
+
+/* The hairline, for sections with no tone of their own. Where two toned
+   blocks meet, the colour change IS the separation and a rule on top of it
+   reads as a seam, so a toned section drops `band` in the markup. */
+.band {
+    border-top: 1px solid var(--border);
+}
+
+/* ── SECTION HEAD ────────────────────────────────────────────────────────
+   Every section heading on the site is set like the "Where we build" one
+   (owner, 2026-09-17): Newsreader, weight 400, --heading-ink, and the same
+   clamp. The values are NOT duplicated from .wwbHeading — .wwbHeading now
+   inherits this rule and only adds its own 18ch measure, so the two cannot
+   drift.
+
+   align-items is flex-end, not baseline. With an eyebrow stacked above the
+   heading the left column is ~3 lines tall, and `baseline` aligns the right-
+   hand description to the EYEBROW's baseline — pinning the caption to the top
+   of the block, level with a 12px label, instead of to the heading it
+   describes. */
+.secHead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-bottom: var(--s3);
+}
+
+/* Wraps the eyebrow + heading so the description stays a direct child of
+   .secHead and keeps its place in the space-between row. min-width:0 because a
+   flex item's default `min-width:auto` refuses to shrink below its longest
+   word, and at 64px one word is wide enough to push the description off. */
+.secHeadMain {
+    min-width: 0;
+}
+
+.secHead--tight {
+    margin-bottom: 18px;
+}
+
+.secHead h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+}
+
+/* .secHead ONLY EVER SIZED h2, and the 16 /projects/state/[state] pages put
+   their page TITLE in a .secHead. So every one of those h1s fell through to the
+   browser default (2em = 32px) and rendered SMALLER than the .secHead h2s
+   further down the same page — the title was the least prominent heading on it.
+   Invisible in review: the markup is correct, the build is green, and one h1
+   per page with no level skips all still pass. It only shows up by resolving
+   which rule actually wins for each heading.
+   Sized above the h2 so the level order and the visual order agree.
+
+   The scale moved with the h2 (26/3vw/36 -> 34/4.4vw/64) for exactly that
+   reason: at the old 32/4vw/46 the page title was SMALLER than every section
+   heading beneath it. Every term here beats the h2's — 40>34, 5.6>4.4, 78>64 —
+   so the order holds at every viewport, not just at the two ends. */
+.secHead h1 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(40px, 5.6vw, 78px);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+}
+
+/* `>` IS LOAD-BEARING. The eyebrow is a <p>, and a bare `.secHead p` (0,1,1)
+   outranks `.secEyebrow` (0,1,0) — so the eyebrow silently rendered as 16px
+   grey body copy with its rule line intact. Every stylesheet here is global and
+   this is the FIFTH time a bare `.parent element` selector has reached into
+   something nested later (client-logo [data-cols], the navbar,
+   `.projects-header span`, `.pdBody`). Wrapper-level typography takes `>`. */
+.secHead > p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 54ch;
+}
+
+/* ── EYEBROW ─────────────────────────────────────────────────────────────
+   The small uppercase label with a trailing rule that sits above a section
+   heading. Lifted from .wwbEyebrow, which now inherits from this.
+
+   ⚠ THE CLASS IS DOUBLED ON PURPOSE — it is not a typo. The eyebrow is a <p>,
+   and NINE existing rules across six stylesheets match a <p> nested inside the
+   blocks it now appears in:
+       .ctaBand p · .bcta p · .svpCta p · .location-header p · .about-content p
+       (x3) · .contact-hero p · .service-cta-box p
+   Every one of those is (0,1,1) and beats a plain `.secEyebrow` (0,1,0), so the
+   eyebrow rendered as 16px grey body copy with its rule line still attached.
+   It was caught by SCREENSHOTTING the page — "GET ADVICE" came out grey where
+   "PORTFOLIO" on the home page came out blue — not by reading the CSS.
+
+   Doubling the class makes it (0,2,0), which beats all nine without !important
+   and without touching them. The alternative — rescoping each parent to
+   `.parent > p` — is what CLAUDE.md recommends generally, but here it would
+   BREAK several of them: .ctaBand's description, for one, is not a direct child
+   of .ctaBand. Fix the selector that moved, not the nine that did not. */
+.secEyebrow.secEyebrow {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--eyebrow);
+    margin-bottom: 24px;
+}
+
+.secEyebrowRule {
+    display: block;
+    width: 64px;
+    height: 1px;
+    background: currentColor;
+    /* flex:none or the 64px collapses when the row is tight. */
+    flex: none;
+}
+
+/* Centred blocks (the CTA band, the brand/state CTA) centre their heading, so
+   the eyebrow has to centre with it rather than hang off the left edge. */
+.secEyebrow--center {
+    justify-content: center;
+}
+
+/* Text belonging to the heading, stacked under it — the state pages' city list.
+   Class doubled for the same reason .secEyebrow is: it is a <p> inside blocks
+   where rules like `.about-content p` (0,1,1) would otherwise win. */
+.secSub.secSub {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 54ch;
+}
+
+.secFoot {
+    text-align: center;
+    margin-top: 44px;
+}
+
+.link {
+    font-weight: 500;
+    color: var(--primary);
+    border-bottom: 1.5px solid var(--primary);
+    padding-bottom: 2px;
+    text-decoration: none;
+    display: inline-block;
+    transition: color .2s, border-color .2s;
+}
+
+.link:hover {
+    color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* Two button styles only (§5 of the plan: six variants meant nobody could learn
+   what was clickable).
+
+   ONE set of metrics for all of them, .bGlow included (button-glow.css repeats
+   these values and says so). They had drifted: .bWhite was 13px/500 in
+   14px/30px padding, .bGhost 12px/600 in 13px/30px — two DIFFERENT type sizes
+   and weights on buttons that sit side by side in the CTA band and the hero,
+   at three different heights once .bGlow's 15px/32px joined them.
+
+   min-height + inline-flex rather than tuned padding, because .bGhost carries
+   a .8px border: with box-sizing: border-box that border sits INSIDE the 48px,
+   so all three are exactly the same height and no one has to keep a fractional
+   padding in step with a border width. */
+.bWhite,
+.bGhost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 32px;
+    border-radius: var(--r-btn);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.bWhite {
+    background: #fff;
+    color: var(--text);
+    transition: transform .2s var(--ease), box-shadow .25s;
+}
+
+.bWhite:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-deep);
+}
+
+.bGhost {
+    background: transparent;
+    color: #fff;
+    /* type + padding come from the shared rule above — this used to re-declare
+       12px/600 and undo it. */
+    border: .8px solid rgba(255, 255, 255, .85);
+    transition: background-color .25s;
+}
+
+.bGhost:hover {
+    background: rgba(255, 255, 255, .16);
+}
+
+/* ── 1. hero (§3.2) ─────────────────────────────────────────────────────── */
+
+.xhero {
+    position: relative;
+    min-height: min(88vh, 760px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.xheroImg {
+    position: absolute;
+    inset: 0;
+    /* Belt and braces: if the cross-fade timing is ever wrong again, a gap
+       shows this dark ground (which the ::after gradient already sits on)
+       rather than the white page behind the hero. */
+    background: #0a0e18;
+}
+
+/* ── mobile hero ─────────────────────────────────────────────────────────
+   The wide slideshow crops to a vertical strip on a phone, which is why a
+   portrait source exists (CLAUDE.md Phase 10.13). That behaviour was lost in
+   the Phase 19 home rebuild — .xheroImg rendered at every width — and this
+   restores it at the same 768px line the header uses.
+
+   Only ONE of the two is in the layout at any width, so a screen reader is
+   never offered the same photograph twice. */
+.xheroMob {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .xheroImg {
+        display: none;
+    }
+
+    .xheroMob {
+        display: block;
+        position: absolute;
+        inset: 0;
+    }
+}
+
+/* ── hero cross-fade ─────────────────────────────────────────────────────
+   Four stacked slides, CSS only. No JS anywhere in this hero: the previous
+   implementation used a setInterval gated on the first image's onLoad, which
+   never fires when the image comes from cache, so the slideshow froze on
+   slide 1 (Phase 10.13). A keyframe cannot stall on a bundle.
+
+   THE FADE-IN IS AT THE START OF THE KEYFRAME, NOT THE END. That is the whole
+   point of this shape and it must stay that way.
+
+   It used to hold at 0%, fade out by 25%, sit at 0, and fade back in over
+   95.83% -> 100%, with delays of 0/6/12/18s. That produced a WHITE FLASH at
+   every transition of the first cycle: `animation-fill-mode` is `none`, so a
+   slide with a positive delay uses its BASE rule until its delay elapses —
+   `opacity: 0`. Slide 1 faded out over 5-6s while slide 2 was still sitting at
+   0 waiting to start, so for one second nothing was on screen and the page
+   showed through. From the second cycle on it looked fine, which is exactly
+   why it read as intermittent.
+
+   `animation-fill-mode: backwards` is NOT the fix — it applies the 0% value
+   during the delay, and with the old keyframe that was `opacity: 1`, which
+   stacks all four images at load.
+
+   4 slides x 6s = 24s cycle, 1s cross-fade. In percentages of 24s, 1s = 4.1667%:
+     0%      -> opacity 0   (start of this slide's turn)
+     4.1667% -> opacity 1   (faded in,  1s)
+     25%     -> opacity 1   (held,      6s)
+     29.1667%-> opacity 0   (faded out, 7s)
+     100%    -> opacity 0   (waiting)
+
+   Delays are (i * 6) - 1 so each slide's 1s fade-in overlaps the previous
+   slide's 1s fade-out exactly — there is never a frame with no image.
+   Slide 1's delay is NEGATIVE: it enters already 1s in, at opacity 1, so the
+   hero does not fade up from nothing on load, and the 23s wrap point lines its
+   fade-in up against slide 4's fade-out.
+
+   Slide 1 is opacity:1 in its BASE rule, not only inside the keyframe, so it
+   is visible even if the animation never runs at all. The others start at 0
+   and are only lifted by their delayed animation — so nothing can flash four
+   images at once before the timeline starts.
+
+   If you add or remove a slide, all three of these have to move together: the
+   cycle length, the four percentages, and every delay. */
+.xheroSlide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: heroCross 24s var(--ease) infinite;
+}
+
+.xheroSlide:first-child {
+    opacity: 1;
+    animation-delay: -1s;
+}
+
+.xheroSlide:nth-child(2) {
+    animation-delay: 5s;
+}
+
+.xheroSlide:nth-child(3) {
+    animation-delay: 11s;
+}
+
+.xheroSlide:nth-child(4) {
+    animation-delay: 17s;
+}
+
+@keyframes heroCross {
+
+    0% {
+        opacity: 0;
+    }
+
+    4.1667%,
+    25% {
+        opacity: 1;
+    }
+
+    29.1667%,
+    100% {
+        opacity: 0;
+    }
+}
+/* The hero cross-fade is now the site's ONLY non-user-triggered animation. It
+   was the second: `.cbFill`, the "Where we build" bar growth, was the other, and
+   it went when that section lost its bar chart (2026-09-17). The brief's budget
+   is one, so this is it — do not add another.
+   It must cancel cleanly: with reduced motion the rotation stops and slide 1
+   stays — a still hero, never a blank one. */
+@media (prefers-reduced-motion: reduce) {
+    .xheroSlide {
+        animation: none;
+    }
+
+    .xheroSlide:first-child {
+        opacity: 1;
+    }
+}
+
+/* Three-stop gradient — light at the top so the photo reads, dark at the base
+   so the copy has contrast without a flat scrim over the whole image. */
+.xheroImg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+            rgba(10, 14, 24, .28),
+            rgba(10, 14, 24, .14) 38%,
+            rgba(10, 14, 24, .88));
+}
+
+.xheroIn {
+    position: relative;
+    width: 100%;
+    padding-bottom: var(--s4);
+    color: #fff;
+}
+
+.xheroKick {
+    font-size: 14px;
+    color: rgba(255, 255, 255, .8);
+    margin-bottom: var(--s2);
+}
+
+/* Raised from clamp(36px, 5.4vw, 58px) when section headings went to
+   clamp(34px, 4.4vw, 64px): the home page's own title was rendering
+   58px against 63px section headings below it, so the largest words on
+   the page were never the ones naming it. Every term beats the h2's
+   (42>34, 6vw>4.4vw, 72>64), so the order holds at every width. */
+.xhero h1 {
+    font-size: clamp(42px, 6vw, 72px);
+    line-height: 1.12;
+    font-weight: 500;
+    max-width: 15ch;
+}
+
+.xheroSub {
+    margin-top: var(--s2);
+    font-size: 17px;
+    color: rgba(255, 255, 255, .85);
+    max-width: 56ch;
+}
+
+.xheroBtns {
+    display: flex;
+    gap: 14px;
+    margin-top: var(--s3);
+    flex-wrap: wrap;
+}
+
+.xheroStats {
+    display: flex;
+    margin-top: var(--s3);
+    border-top: 1px solid rgba(255, 255, 255, .25);
+    padding-top: var(--s2);
+    flex-wrap: wrap;
+    gap: var(--s3);
+}
+
+.hs {
+    padding-right: var(--s3);
+    border-right: 1px solid rgba(255, 255, 255, .2);
+}
+
+.hs:last-child {
+    border-right: none;
+    padding-right: 0;
+}
+
+/* The heading serif, like the h1 above it and the same three facts on /about
+   (.stat h3). These were animated figures in the body sans until the numbers
+   came off the site (2026-10-01); as words they read as headings, and in Geist
+   they clashed with the serif title (owner, 2026-10-07). Size, weight and
+   spacing unchanged; the small labels (.hsL) stay in Geist. */
+.hsN {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+.hsL {
+    font-size: 13px;
+    color: rgba(255, 255, 255, .7);
+    margin: 4px 0 0;
+}
+
+/* ── 2. selected projects (§3.4) ────────────────────────────────────────── */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s3);
+}
+
+.card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--surface-soft);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-soft);
+}
+
+.frame img {
+    transition: transform .6s var(--ease);
+}
+
+.card:hover .frame img,
+.card:focus-visible .frame img {
+    transform: scale(1.06);
+}
+
+/* No photograph — a soft tile, never a broken image and never a stock photo. */
+.phTile {
+    position: absolute;
+    inset: 0;
+    background: var(--surface-soft);
+    display: flex;
+    align-items: flex-end;
+    padding: 18px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.veil {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 20px;
+    color: #fff;
+    font-size: 13px;
+    background: linear-gradient(transparent, rgba(21, 21, 21, .85));
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .3s var(--ease), transform .3s var(--ease);
+}
+
+.card:hover .veil,
+.card:focus-visible .veil {
+    opacity: 1;
+    transform: none;
+}
+
+.cap {
+    display: block;
+    margin-top: 14px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.capSub {
+    display: block;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* ── 3. where we build ──────────────────────────────────────────────────────
+   Third design of this section. It was a bar chart (16 states, proportional
+   bars, project counts), then photo cards + chips, now an India map with a
+   derived state/city grid. Gone with the earlier two: `.cov`, `.covBig`,
+   `.covBigLabel`, `.covBars`, the `.cb*` family, `@keyframes cbGrow`, and the
+   whole `.wb*` set.
+
+   `.covCopy` and `.covLink` DELIBERATELY SURVIVE and are left below: `.covLink`
+   is used by components/home/StudioBlock.jsx and `.covCopy` by
+   projects/state/[state]/page.js. Every stylesheet here is global, so deleting
+   a rule because the component it was named for is gone breaks whatever else
+   quietly adopted it — the trap CLAUDE.md records four separate times.
+
+   This section opts OUT of the site's `.sec`/`.band` rhythm: the brief asks for
+   a plain white ground and its own 140/112px padding, so it sets those itself
+   rather than inheriting. It is the only section on the home page that does. */
+
+.covCopy {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 44ch;
+    margin-top: 26px;
+}
+
+.covLink {
+    margin-top: 24px;
+}
+
+/* Local tokens. Scoped to the section rather than promoted to :root — these are
+   the brief's palette for this block and several are near-misses for the site's
+   own (accent #2340a8 against --primary #264ea0). Two global blues that differ
+   by three hex digits is how a palette rots; keeping them local says plainly
+   that this block has its own. */
+.wwb {
+    /* --wwb-ink and --wwb-accent moved to :root as --heading-ink / --eyebrow
+       when the owner asked for this section style site-wide. They are aliased
+       rather than deleted so the ~30 .wwb* rules below did not all have to be
+       rewritten in the same pass — but there is now ONE definition of each
+       value, in globals.css. Do not give these literals back. */
+    --wwb-ink: var(--heading-ink);
+    --wwb-muted: #5a6480;
+    --wwb-accent: var(--eyebrow);
+    --wwb-rule: #c9d2ea;
+    --wwb-map: #3b57b8;
+
+    /* The white here is data-tone="plain" now (see SECTION TONES at the top of
+       this file). Hardcoding it too would mean this one section stops tracking
+       the site-wide pair the moment either value changes. */
+    padding: 140px 112px;
+    /* The compass is absolutely positioned against this. */
+    position: relative;
+    overflow: hidden;
+}
+
+.wwbInner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    gap: 64px;
+    align-items: start;
+}
+
+/* ── left column ────────────────────────────────────────────────────────── */
+
+.wwbEyebrow {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--wwb-accent);
+}
+
+.wwbEyebrowRule {
+    display: block;
+    width: 64px;
+    height: 1px;
+    background: currentColor;
+    /* flex:none or the 64px collapses when the row is tight. */
+    flex: none;
+}
+
+/* This was the source of the site-wide section-heading style, so it now states
+   only what is DIFFERENT from `.secHead h2`: its own measure and top margin.
+   Family, size, weight, leading, tracking and colour are inherited from the
+   shared rule — duplicating them here is what would let the section that
+   defines the look drift away from the rest of the site. */
+.wwbHeading {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    /* The brief's "max ~18 characters per line". */
+    max-width: 18ch;
+    margin-top: 28px;
+}
+
+.wwbLede {
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--wwb-muted);
+    max-width: 44ch;
+    margin-top: 28px;
+}
+
+.wwbGrid {
+    margin-top: 56px;
+}
+
+.wwbStates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px 32px;
+}
+
+.wwbStateName {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--wwb-accent);
+}
+
+/* The hairline runs to the end of the column, however long the name is. */
+.wwbStateRule {
+    display: block;
+    flex: 1;
+    height: 1px;
+    background: var(--wwb-rule);
+}
+
+.wwbCities {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.wwbCity {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    line-height: 1.4;
+    text-decoration: none;
+    color: var(--wwb-ink);
+    transition: color .18s ease;
+}
+
+.wwbCityArrow {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    transition: transform .18s ease;
+}
+
+/* .isOn is set from React when the matching DOT is hovered or focused, so the
+   highlight travels map -> list as well as list -> map. :hover/:focus-visible
+   are kept alongside it so the link still responds with no JS. */
+.wwbCity:hover,
+.wwbCity:focus-visible,
+.wwbCity.isOn {
+    color: var(--wwb-accent);
+}
+
+.wwbCity:hover .wwbCityArrow,
+.wwbCity:focus-visible .wwbCityArrow,
+.wwbCity.isOn .wwbCityArrow {
+    transform: translateX(4px);
+}
+
+.wwbCity:focus-visible {
+    outline: 2px solid var(--wwb-accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* Deliberately quiet — it exists to keep 8 state pages internally linked, not
+   to compete with the grid above it. See the comment at its call site. */
+.wwbAlso {
+    margin-top: 36px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--wwb-muted);
+    max-width: 62ch;
+}
+
+.wwbAlso a {
+    color: var(--wwb-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--wwb-rule);
+    transition: color .18s ease, border-color .18s ease;
+}
+
+.wwbAlso a:hover,
+.wwbAlso a:focus-visible,
+.wwbAlso a.isOn {
+    color: var(--wwb-accent);
+    border-color: var(--wwb-accent);
+}
+
+.wwbAlso a:focus-visible {
+    outline: 2px solid var(--wwb-accent);
+    outline-offset: 2px;
+}
+
+.wwbCtaWrap {
+    margin-top: 56px;
+}
+
+.wwbCta {
+    display: inline-block;
+    padding: 16px 30px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--wwb-accent);
+    border: 1.5px solid var(--wwb-accent);
+    transition: background .2s ease, color .2s ease;
+}
+
+.wwbCta:hover,
+.wwbCta:focus-visible {
+    background: var(--wwb-accent);
+    color: #ffffff;
+}
+
+.wwbCta:focus-visible {
+    outline: 2px solid var(--wwb-accent);
+    outline-offset: 3px;
+}
+
+/* ── map ────────────────────────────────────────────────────────────────── */
+
+.wwbMapCol {
+    /* Sticks the map beside the grid rather than letting it float mid-column
+       when the left side is taller. */
+    display: flex;
+    justify-content: center;
+
+    /* Drops the map clear of the eyebrow (owner, 2026-09-23). .wwbInner is
+       `align-items: start`, so without this the SVG's top edge sat at exactly
+       the same y as the 12px "WHERE WE BUILD" label — the map read as hanging
+       off the top of the section, while the left column ran 185px TALLER than
+       the map, so every bit of slack piled up under it.
+       80px puts the map's top below the heading's first line and halves that
+       bottom gap. It is on the left column's own vertical rhythm — .wwbGrid
+       uses 56px — rather than an eyeballed nudge.
+       Zeroed below 1100px, where the map is `order: -1` and sits ABOVE the
+       text: there the padding would just be dead space at the section's top. */
+    padding-top: var(--s4);
+}
+
+.wwbMap {
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    /* The SVG is 1000x1070 and every stroke width below is in USER units, so
+       they scale with the box — hence the fractional values. */
+    overflow: visible;
+}
+
+/* Under-layer: thick stroke, painted out on every internal edge by the
+   over-layer's white fills. What survives is the coastline and land border. */
+.wwbMapOutline path {
+    fill: #ffffff;
+    stroke: var(--wwb-map);
+    stroke-width: 3.6;
+    stroke-linejoin: round;
+}
+
+.wwbMapStates path {
+    fill: #ffffff;
+    stroke: var(--wwb-map);
+    stroke-width: 1.1;
+    stroke-opacity: .3;
+    stroke-linejoin: round;
+}
+
+/* The 16 states with projects. A flat tint rather than a per-state intensity:
+   the counts were removed from this section deliberately, and shading Haryana
+   darker than Odisha would put the ranking straight back in visual form.
+   Light enough that the 30% state hairlines still read through it. */
+.wwbMapStates path.isActive {
+    fill: #dfe6f8;
+    transition: fill .18s ease;
+}
+
+/* Pointing at a name in the "Also delivering in ..." line lifts that one state
+   out of the flat 16-state tint. It has to come AFTER .isActive: both are
+   (0,1,1), so source order is the only thing that decides, and the two classes
+   are on the same element. The accent outline does most of the work — the fill
+   alone is a small step up from #dfe6f8 and is easy to miss on a small state
+   like Chandigarh, which is a single pixel-scale polygon at this size.
+
+   Stroke is on the tinted layer, which paints over the outline layer beneath,
+   so the highlight reads even where two project states share a border. */
+.wwbMapStates path.isHot {
+    fill: var(--wwb-accent);
+    fill-opacity: .55;
+    stroke: var(--wwb-accent);
+    stroke-width: 2.2;
+    stroke-opacity: 1;
+}
+
+/* Locator ring for a highlighted state whose polygon is too small to read —
+   Chandigarh at 2x2 px. Same mark as .wwbDotRing so the map has one vocabulary
+   for "this is the thing you are pointing at", not two. */
+.wwbHotMark {
+    fill: none;
+    stroke: var(--wwb-accent);
+    stroke-width: 2;
+    pointer-events: none;
+}
+
+.wwbDot {
+    color: var(--wwb-accent);
+    cursor: pointer;
+}
+
+.wwbDotCore {
+    fill: currentColor;
+    transition: r .18s ease;
+}
+
+.wwbDotRing {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(.4);
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.wwbDotLabel {
+    /* SVG <text> is matched by the globals `*` rule, so this inherits
+       Newsreader like everything else. Named explicitly anyway: a map label is
+       the one place a font swap is most visible, since it has no surrounding
+       text to be measured against. */
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: 21px;
+    font-weight: 500;
+    fill: var(--wwb-ink);
+    opacity: 0;
+    transition: opacity .18s ease;
+    /* Or the label steals the pointer from the dot it describes. */
+    pointer-events: none;
+}
+
+.wwbDot.isOn .wwbDotCore {
+    r: 8;
+}
+
+.wwbDot.isOn .wwbDotRing {
+    opacity: .45;
+    transform: scale(1);
+}
+
+.wwbDot.isOn .wwbDotLabel {
+    opacity: 1;
+}
+
+/* ── "across india" compass ─────────────────────────────────────────────── */
+
+.wwbCompass {
+    position: absolute;
+    right: 40px;
+    top: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    color: var(--wwb-muted);
+}
+
+.wwbCompassText {
+    writing-mode: vertical-rl;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.wwbCompassLine {
+    width: 1px;
+    height: 72px;
+    background: var(--wwb-rule);
+}
+
+.wwbCompassArrow {
+    width: 11px;
+    height: 15px;
+}
+
+.wwbCompassN {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* ── responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 1280px) {
+
+    .wwb {
+        padding: 110px 64px;
+    }
+}
+
+@media (max-width: 1100px) {
+
+    .wwbInner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    /* Map ABOVE the text, per the brief. order, not a DOM move: the text has to
+       stay first in the markup so a screen reader and a crawler meet the
+       heading before a decorative map. */
+    .wwbMapCol {
+        order: -1;
+        /* stacked above the text — nothing to clear, see the base rule */
+        padding-top: 0;
+    }
+
+    .wwbMap {
+        max-width: 420px;
+    }
+
+    .wwbCompass {
+        display: none;
+    }
+}
+
+@media (max-width: 860px) {
+
+    .wwb {
+        padding: 80px 40px;
+    }
+
+    .wwbStates {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+
+    .wwbStates {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .wwb {
+        /* 20px gutters, and the section sets its own because it opts out of
+           .wrapx. Anything less and the 2-column state grid touches the edge. */
+        padding: 64px 20px;
+    }
+
+    .wwbGrid {
+        margin-top: 40px;
+    }
+
+    .wwbCtaWrap {
+        margin-top: 40px;
+    }
+
+    .wwbCta {
+        display: block;
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .wwbCity,
+    .wwbCityArrow,
+    .wwbCta,
+    .wwbDotCore,
+    .wwbDotRing,
+    .wwbDotLabel {
+        transition: none;
+    }
+
+    /* The colour and the label still change — only the movement stops. */
+    .wwbCity:hover .wwbCityArrow,
+    .wwbCity:focus-visible .wwbCityArrow,
+    .wwbCity.isOn .wwbCityArrow {
+        transform: none;
+    }
+
+    .wwbDot.isOn .wwbDotRing {
+        transform: scale(1);
+    }
+}
+
+/* ── 4. brand wall (§3.6) ───────────────────────────────────────────────── */
+
+.wall {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: var(--s3);
+    align-items: start;
+}
+
+.preview {
+    position: sticky;
+    /* Below the fixed header (96px since 2026-10-07) with a 16px gap. It was
+       110px under a 122px header, so its top 12px sat behind the nav. */
+    top: 112px;
+}
+
+.pvFrame {
+    aspect-ratio: 4 / 5;
+    background: var(--surface-soft);
+    overflow: hidden;
+    position: relative;
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-soft);
+}
+
+.pvBlank {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+}
+
+.pvName {
+    font-size: 24px;
+    font-weight: 500;
+    margin-top: 18px;
+}
+
+.pvMeta {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.pvGo {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+    border-bottom: 1.5px solid var(--primary);
+    padding-bottom: 2px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.tiles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.tile {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    /* The tiles are <a> now (they open /projects/brand/[brand]); they were
+       <button>s, which have no underline to remove. */
+    text-decoration: none;
+    transition: border-color .25s, transform .25s var(--ease), box-shadow .25s;
+}
+
+.tile:hover,
+.tile.on {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: var(--sh-mid);
+}
+
+.tName {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.4;
+    transition: color .25s;
+}
+
+.tile:hover .tName,
+.tile.on .tName {
+    color: var(--primary);
+}
+
+.tN {
+    font-size: 12px;
+    color: var(--muted);
+    opacity: .6;
+    margin-top: 12px;
+    transition: opacity .25s;
+}
+
+.tile:hover .tN,
+.tile.on .tN {
+    opacity: 1;
+}
+
+/* 20+ projects spans two columns — this is how Geetanjali reads as the anchor
+   client without being named anywhere in the markup. */
+.tile.big {
+    min-height: 214px;
+    border-color: var(--primary);
+    background: var(--surface-soft);
+}
+
+.tiles li:has(.tile.big) {
+    grid-column: span 2;
+}
+
+.tile.big .tName {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.tile.big .tN {
+    font-size: 14px;
+    opacity: 1;
+}
+
+/* ── 5. what we do (§3.8) ───────────────────────────────────────────────── */
+
+.svc {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s2);
+}
+
+.sv {
+    display: block;
+    padding: var(--s3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    background: #fff;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .25s, box-shadow .25s, transform .25s var(--ease);
+}
+
+.sv:hover {
+    border-color: var(--primary);
+    box-shadow: var(--sh-mid);
+    transform: translateY(-3px);
+}
+
+.sv h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.sv p {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+
+.svN {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+/* ── 6. studio ──────────────────────────────────────────────────────────── */
+
+/* 400px and a 3/4 portrait (533px tall) rather than 360 and 4/5 (450px): the
+   right column grew a lot when the founder block moved in, and the shorter
+   image left a large well of white beside the quote. `align-self: start` on the
+   image — set below, not via align-items — keeps the portrait level with the
+   heading while letting the text run past it. */
+.studio {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: var(--s4);
+}
+
+.studioImg {
+    position: relative;
+    align-self: start;
+    aspect-ratio: 3 / 4;
+    background: var(--surface-soft);
+    overflow: hidden;
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-soft);
+}
+
+/* The home studio section is ONE subject now: the founder, beside his
+   photograph. `.studioLede`, `.studioMeta` and the `.studioFounder` divider
+   wrapper are all gone with the copy they held — the lede moved to /about,
+   where the studio's origin story belongs, and the rule between the two halves
+   went with it because there are no longer two halves.
+
+   The block's type comes from the sd* rules in studio-page.css, shared with
+   /about's Founder section so the same person is set the same way in both.
+
+   .covLink is shared with the coverage section, so the extra room before
+   "More about the studio" is scoped to this one place. */
+.sdQuote + .covLink {
+    margin-top: 32px;
+}
+
+
+/* ── 7. testimonials (§3.8) ─────────────────────────────────────────────── */
+
+.tst {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s2);
+}
+
+.q {
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    padding: var(--s3);
+    background: #fff;
+    margin: 0;
+    transition: border-color .25s, box-shadow .25s;
+}
+
+/* Rating stars. Amber, not --primary: a blue star does not read as a rating,
+   and this is the one place the site uses a colour outside the palette — a
+   review star is a convention, like a red error. Kept to this one component. */
+.qStars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 16px;
+    color: #f5a623;
+}
+
+.qStar {
+    flex-shrink: 0;
+}
+
+/* The empty state is the same amber at low opacity rather than grey, so a
+   4-of-5 reads as "one missing" instead of two different icons. */
+.qStar:not(.qStar--on) {
+    opacity: .35;
+}
+
+.q:hover {
+    border-color: var(--primary);
+    box-shadow: var(--sh-soft);
+}
+
+.q blockquote {
+    margin: 0;
+}
+
+.q p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.q .who {
+    display: block;
+    margin-top: var(--s2);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.q .role {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ── 8. CTA band (§3.9) ─────────────────────────────────────────────────── */
+
+/* OFF-WHITE, floating. It has now been --surface (near-black), then --primary
+   (brand blue), and blue was wrong for a structural reason worth recording: the
+   footer is --primary too, so the band and the footer merged into one
+   undifferentiated slab, and the contact card — white-on-white at 8% — all but
+   disappeared inside it. Two adjacent full-width blocks cannot share a
+   background and stay readable.
+
+   Light solves that permanently: whatever colour the footer becomes, this reads
+   against it.
+
+   The tint is deeper than --surface-soft (#F4F6FA), which is 1.08:1 against the
+   page and effectively invisible on white — the band had no edge at all. This
+   is 1.18:1: still quiet, but the block has a shape. It is a one-off SURFACE
+   tint, not a second accent (§1) — a blue cast of --primary, so it belongs to
+   the same family. Text on it: --text 17.7:1, --muted 4.9:1, --primary 6.6:1,
+   all AA.
+
+   --sh-mid, not --sh-soft: soft is a 4%-black haze that a block this size
+   swallows. Mid is the chromatic blue elevation the tokens describe, and it is
+   what gives the band an edge rather than a fade. */
+.ctaBand {
+    /* WHITE, not the old #E7ECF7 tint. The canvas is now tinted, and #E7ECF7
+       measures 1.02:1 against it - the band would have vanished. Going DEEPER
+       instead is impossible: separating from the canvas needs L <= 0.734 while
+       --muted at AA needs L >= 0.773. White satisfies both (1.15:1 from the
+       canvas, --muted 5.7:1) and keeps Phase 23's rule that two adjacent
+       full-width blocks cannot share a ground. */
+    background: #ffffff;
+    color: var(--text);
+    padding: var(--s4) 0;
+    border-radius: var(--r-lg);
+    /* Space on ALL four sides, top included. It used to have none on top, so
+       the card sat flush against the full-width white testimonials section
+       above it and its rounded top corners cut into that section — it read as
+       the two overlapping (owner, 2026-09-30). */
+    margin: var(--s3);
+    box-shadow: var(--sh-mid);
+}
+
+.ctaBand h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    max-width: 16ch;
+    line-height: 1.12;
+}
+
+.ctaBand p {
+    color: var(--muted);
+    margin-top: 16px;
+    max-width: 52ch;
+}
+
+/* .bGhost is built for dark grounds — white outlined text vanishes here.
+   (.bWhite's recolour used to live alongside this; the band's primary CTA is
+   .bGlow now, which brings its own ground.) */
+.ctaBand .bGhost {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.ctaBand .bGhost:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Two columns: the ask, and the direct channels. Replaced a single dim
+   `.ctaBand-nap` line that repeated the street address a few pixels above the
+   footer's Studio column — the page closed with the same address twice. */
+.ctaBand-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: var(--s3) var(--s4);
+    align-items: center;
+}
+
+.ctaBand-actions {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* White card on the off-white band — the contrast the translucent-white version
+   never had. Lifts on hover like the project and testimonial cards do. */
+.ctaBand-card {
+    /* Tinted now that the band is white - the inverse of the old pairing. */
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    padding: var(--s2) var(--s2) 22px;
+    box-shadow: var(--sh-soft);
+    transition: transform .25s var(--ease), box-shadow .25s var(--ease),
+        border-color .25s var(--ease);
+}
+
+.ctaBand-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: var(--sh-mid);
+}
+
+.ctaBand-cardHead {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+
+.ctaBand-channels {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ctaBand-channels li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    color: var(--text);
+}
+
+.ctaBand-channels li > svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--primary);
+}
+
+.ctaBand-channels span {
+    display: block;
+    line-height: 1.35;
+}
+
+.ctaBand-channels small {
+    display: block;
+    margin-top: 3px;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+.ctaBand-channels a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color .2s var(--ease);
+}
+
+.ctaBand-channels a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* The lift sticks after a tap on touch devices. */
+@media (hover: none) {
+    .ctaBand-card:hover {
+        transform: none;
+        border-color: var(--border);
+        box-shadow: var(--sh-soft);
+    }
+}
+
+/* ── responsive (§5) ────────────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+
+    .wall,
+    .cov,
+    .studio,
+    .ctaBand-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .preview {
+        position: static;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: var(--s2);
+        align-items: center;
+        margin-bottom: var(--s3);
+    }
+
+    .pvFrame {
+        aspect-ratio: 1;
+    }
+
+    .tiles {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid,
+    .tst,
+    .svc {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .studioImg {
+        aspect-ratio: 3 / 2;
+    }
+}
+
+@media (max-width: 680px) {
+
+    .wrapx {
+        padding: 0 20px;
+    }
+
+    .grid,
+    .tst,
+    .svc {
+        grid-template-columns: 1fr;
+    }
+
+    .tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .preview {
+        grid-template-columns: 1fr;
+    }
+
+    .hs {
+        padding-right: 20px;
+    }
+
+    .cb {
+        grid-template-columns: 100px 1fr 32px;
+    }
+
+    .ctaBand {
+        margin: 20px; /* all four sides — see .ctaBand above */
+        padding: 48px 0;
+    }
+
+    /* §5: every tap target reaches 44px on small screens. .bWhite / .bGhost /
+       .bGlow are not listed any more — they are 48px at every width now, and
+       naming them here only shrank them on phones. */
+    .link,
+    .pvGo {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* ── motion & focus (§6) ────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .xhero *,
+    .card,
+    .frame img,
+    .veil,
+    .tile,
+    .sv,
+    .q,
+    .bWhite,
+    .bGhost,
+    .link {
+        transition: none !important;
+    }
+
+}

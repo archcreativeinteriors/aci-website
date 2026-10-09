@@ -1,0 +1,193 @@
+/* ================= COSTING PAGE ================= */
+
+.costing-page {
+    padding: 60px 20px 100px;
+    /* No background: the page canvas gradient (globals.css) shows through. */
+    min-height: 100vh;
+}
+
+/* HERO */
+
+.costing-hero {
+    max-width: 850px;
+    margin: auto;
+    text-align: center;
+    margin-bottom: 70px;
+}
+
+.costing-hero span {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.costing-hero h1 {
+    font-size: 58px;
+    line-height: 1.15;
+    color: #111;
+    margin: 18px 0;
+    font-weight: 500;
+}
+
+.costing-hero p {
+    max-width: 650px;
+    margin: auto;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+}
+
+/* ================= CARD ================= */
+
+.costing-card {
+    max-width: 1150px;
+    margin: auto;
+
+    background: #fff;
+
+    border-radius: 30px;
+
+    padding: 70px;
+
+    display: grid;
+    grid-template-columns: 0.9fr auto 1.1fr;
+    gap: 60px;
+
+    align-items: center;
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.04),
+        0 30px 80px rgba(0, 0, 0, 0.06);
+
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* PRICE */
+
+.costing-price h2 {
+    font-size: 54px;
+    line-height: 1;
+    color: #111;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.costing-price span {
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #777;
+}
+
+.costing-price p {
+    margin-top: 25px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #666;
+}
+
+/* DIVIDER */
+
+.costing-divider {
+    width: 1px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* INCLUDED */
+
+.costing-includes h3 {
+    font-size: 28px;
+    color: #111;
+    margin-bottom: 35px;
+    font-weight: 500;
+}
+
+/* GRID */
+
+.includes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px 35px;
+}
+
+/* ITEM */
+
+.include-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.include-item span {
+    font-size: 15px;
+    color: #111;
+    margin-top: 2px;
+}
+
+.include-item p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+    .costing-card {
+        grid-template-columns: 1fr;
+        padding: 45px 30px;
+        gap: 40px;
+    }
+
+    .costing-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .includes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .costing-hero h1 {
+        font-size: 42px;
+    }
+
+    .costing-price h2 {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .costing-page {
+        padding: 120px 20px 80px;
+    }
+
+    .costing-hero h1 {
+        font-size: 34px;
+    }
+
+    .costing-hero p {
+        font-size: 14px;
+    }
+
+    .costing-card {
+        border-radius: 20px;
+        padding: 35px 20px;
+    }
+
+    .costing-price h2 {
+        font-size: 34px;
+    }
+
+    .costing-includes h3 {
+        font-size: 24px;
+    }
+
+    .include-item p {
+        font-size: 14px;
+    }
+}

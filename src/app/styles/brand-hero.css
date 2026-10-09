@@ -1,0 +1,98 @@
+/* =========================================================
+   Brand page hero — location chips and "Explore more" link
+   (components/brand/BrandHero.jsx, BrandExploreLink.jsx).
+   Every selector is prefixed `bh-`, except the scroll margin
+   on the section the link scrolls to. The old `.bstats`
+   rules in brand-page.css are no longer used.
+   ========================================================= */
+
+.bh-places {
+    list-style: none;
+    margin: var(--s3) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bh-place {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 13.5px;
+    line-height: 1.2;
+    color: var(--text);
+}
+
+.bh-place svg {
+    flex: none;
+    color: var(--primary);
+}
+
+.bh-place--more {
+    background: transparent;
+    border-style: dashed;
+    color: var(--muted);
+}
+
+.bh-explore {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--s3);
+    padding: 13px 22px;
+    border-radius: var(--r-btn);
+    background: var(--primary);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .25s var(--ease);
+}
+
+.bh-explore:hover {
+    background: var(--primary-dark);
+}
+
+.bh-explore:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.bh-explore__arrow {
+    flex: none;
+    transition: transform .25s var(--ease);
+}
+
+.bh-explore:hover .bh-explore__arrow,
+.bh-explore:focus-visible .bh-explore__arrow {
+    transform: translateY(3px);
+}
+
+/* The header is fixed: land the list's heading below it (the same offsets
+   globals.css gives #main-content). */
+#all-projects {
+    scroll-margin-top: 104px;
+}
+
+@media (max-width: 767px) {
+    #all-projects {
+        scroll-margin-top: 72px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bh-explore,
+    .bh-explore__arrow {
+        transition: none;
+    }
+
+    .bh-explore:hover .bh-explore__arrow,
+    .bh-explore:focus-visible .bh-explore__arrow {
+        transform: none;
+    }
+}

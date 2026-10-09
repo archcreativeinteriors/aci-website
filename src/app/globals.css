@@ -1,0 +1,266 @@
+/* ================= DESIGN TOKENS (redesign brief §1) =================
+   The approved values, copied verbatim. Before this the site had NO tokens of
+   its own — all 41 custom properties in the page belonged to react-toastify,
+   which is why the audit found four blues, six button styles and six radii.
+   Use these; do not add a second accent colour.
+
+   NOTE: the reference demo calls four variables it never defines — they fall
+   back silently and lose their colour. Correct mapping, per brief §1:
+     var(--mute)  -> var(--muted)    (11 occurrences in the demo)
+     var(--line)  -> var(--border)   (1)
+     var(--ink)   -> var(--text)     (1)
+     var(--accent)-> var(--primary)  (1)
+   Do not copy those typos forward. */
+:root {
+    /* palette */
+    --primary: #264ea0;        /* brand accent, CTAs, links, active states */
+    --primary-dark: #1b3a78;   /* hover only */
+    --secondary: #0077b6;      /* secondary highlights, sparing use */
+    --bg: #E9EFFA;             /* page canvas — tinted, NOT white (see body) */
+    --bg-top: #F8FAFE;         /* canvas gradient start, near-white */
+    --bg-grad:                 /* the glow is --primary at 10% */
+        radial-gradient(1100px 520px at 50% -60px, rgba(38, 78, 160, .10), transparent 70%),
+        linear-gradient(180deg, var(--bg-top) 0px, var(--bg) 1100px);
+    --surface: #151515;        /* dark CTA band, dark cards */
+    --surface-soft: #F4F6FA;   /* alternating sections, empty image tiles */
+    --text: #000000;
+    --muted: #666666;
+
+    /* Section-heading pair, promoted to :root from the local palette that used
+       to live on `.wwb` (owner, 2026-09-17: every section heading now matches
+       the "Where we build" one). They are defined ONCE here and `.wwb` reads
+       them, so the section that set the style and the rest of the site cannot
+       drift apart.
+       ⚠ --eyebrow (#2340a8) is a THIRD blue, three hex digits off --primary
+       (#264ea0). It came in with the "Where we build" brief and is now site-
+       wide because the owner asked for that exact look. If the palette is ever
+       consolidated, this is the value to reconcile — not a fourth one to add. */
+    --heading-ink: #0f1b3d;
+    --eyebrow: #2340a8;
+
+    /* ── SECTION TONES (owner, 2026-09-22) ───────────────────────────────
+       Sections alternate tinted / white down every multi-section page. The
+       two values are the ones the site already used — the canvas tint and
+       the white "Where we build" block — so the rhythm the owner pointed at
+       (Selected projects tinted, Where we build white) simply continues
+       instead of introducing a new colour.
+       Applied with `data-tone`, never a class: see the rule in home.css. */
+    --tone-tint: #E9EFFA;   /* identical to --bg, so a tinted section and the
+                               bare canvas are indistinguishable */
+    --tone-plain: #ffffff;
+    --border: #D9E0EC;         /* all hairlines and dividers. Deepened from
+                                  #E4E7EC with the canvas: on the tint that
+                                  measured 1.07:1 and hairlines vanished. */
+
+    /* spacing — 40px base scale */
+    --s1: 8px;
+    --s2: 20px;
+    --s3: 40px;
+    --s4: 80px;
+    --s5: 120px;
+
+    /* radius — four sizes, used by role, never mixed arbitrarily */
+    --r-btn: 50px;   /* pills: buttons, chips, sort toggles */
+    --r-chip: 30px;  /* small pills: tags, progress-bar tracks */
+    --r-card: 20px;  /* image frames, cards, panels */
+    --r-lg: 30px;    /* full-bleed blocks: hero bottom, CTA band, map panel */
+
+    /* elevation — chromatic, not grey. The blue shadow is deliberate: it is
+       what stops the cards reading as a generic SaaS kit. Keep it. */
+    --sh-soft: rgba(0, 0, 0, .04) 0 10px 40px 0;
+    --sh-mid: rgba(38, 78, 160, .22) 0 8px 18px 0;
+    --sh-deep: rgba(0, 0, 0, .25) 0 10px 30px 0;
+
+    --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+/* Brief §5: the spacing scale shrinks on small screens. */
+@media (max-width: 680px) {
+    :root {
+        --s3: 24px;
+        --s4: 56px;
+        --s5: 72px;
+    }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* Body font for the whole site. This read `"Poppins", sans-serif` and
+     **Poppins was never loaded anywhere** — no <link>, no next/font call, that
+     one declaration was its only mention in the repo. So every page fell
+     through to generic `sans-serif` and rendered in the browser default, Arial
+     on Windows, while Geist downloaded on all 131 routes and styled nothing.
+     Both halves are fixed: Geist is named here, so it is now actually used.
+     See the comment in layout.js. */
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Headings only — the serif is display type, not body type (owner, 2026-09-17).
+   It was briefly on every element; a serif at 14-15px down the 192-row project
+   index and across the legal pages reads noticeably worse than a sans.
+
+   This sits after the `*` rule and is more specific, so it wins without
+   !important. Anything that needs the serif and is NOT a heading has to name it
+   itself — `.wwbHeading`, `.wwbCity` and `.wwbDotLabel` in home.css do. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Safety net against stray horizontal scroll on mobile. `clip` (not `hidden`)
+   so it doesn't create a scroll container or break position: sticky. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+/* ScrollReveal — content is visible by default (idle). JS adds "armed" to hide
+   it, then "in" to animate up. If JS never runs, everything stays visible. */
+[data-reveal="armed"] {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+[data-reveal="in"] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Clears the fixed header (topbar + nav). Every page relies on this single
+   rule for nav clearance — don't also add nav-clearance padding per page. */
+body {
+  padding-top: 96px; /* 32px topbar + 64px nav */
+}
+
+@media (max-width: 767px) {
+  /* Topbar is dropped below 768px (see styles/navbar.css) — only the bare
+     64px nav needs clearing here. */
+  body {
+    padding-top: 64px;
+  }
+}
+
+/* ================= PAGE CANVAS =================
+   A light blue-grey gradient in the --primary family, not flat white. This is
+   the /clients ground (Phase 11: "soft tinted ground so the white logo cards
+   read as cards, not as holes") promoted to the whole site.
+
+   The linear gradient resolves into --bg by 1100px, and --bg is ALSO the
+   background-color, so the ground is identical on a short page and on the
+   192-row projects index. Do not switch that to a percentage stop: on a tall
+   page it stretches the fade over 20,000px and the tint reads as a bug.
+
+   Contrast on --bg (#E9EFFA): --text 16.5:1, --muted 5.0:1, --primary 6.8:1,
+   white 1.15:1 - all AA, and white panels now have an edge they never had on a
+   white page. No background-attachment: fixed - it repaints on every scroll
+   frame on mobile, and this site already has mobile perf constraints. */
+body {
+  background-color: var(--bg);
+  background-image: var(--bg-grad);
+  background-repeat: no-repeat;
+}
+
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Visually hidden but present for screen readers, other assistive tech, and
+   agents reading the accessibility tree (e.g. a <label> paired with a
+   placeholder-only input). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* ── skip-to-content link (a11y) ──────────────────────────────────────────
+   The first focusable element in <body>, so a keyboard or screen-reader user
+   can jump past the fixed header and the six nav links straight to <main>.
+   Off-screen until focused, then pinned top-left above everything (the tallest
+   thing on the site is the mobile menu at z-index 1001).
+
+   It must NOT use .sr-only: that clips to a 1px box, so the link would stay
+   invisible even while focused. Being visible on focus is the whole point.
+
+   #main-content carries scroll-margin-top because the header is fixed and
+   `body { padding-top }` is the ONLY thing clearing it (see Known issues).
+   Without it the browser scrolls <main> to y=0 — underneath the nav — and the
+   user lands on content they cannot see. The two values track the header's own
+   two heights: 96px desktop, 64px below 768px. If that body rule ever
+   changes, change these with it.
+
+   The focus outline is suppressed on #main-content ONLY. Focus is moved there
+   programmatically by this link, never by tabbing, so an outline around the
+   whole page would be noise rather than a cue — the visible cue is the page
+   having scrolled to the content. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 2000;
+  padding: 12px 20px;
+  background: var(--primary, #264ea0);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 8px 8px;
+  transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #fff;
+  outline-offset: -6px;
+}
+
+#main-content {
+  scroll-margin-top: 104px;
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  #main-content {
+    scroll-margin-top: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}

@@ -1,0 +1,382 @@
+/* ================= CONTACT PAGE (/contact) ================= */
+
+.contact-hero {
+    max-width: 700px;
+    margin: 50px auto 0;
+    padding: 0 20px;
+    text-align: center;
+}
+
+/* Scoped to the LABEL span — see the matching note in about.css. */
+.contact-hero .secEyebrow > span:first-child {
+    letter-spacing: 3px;
+}
+
+/* Same fix as .about-top h1: the 40/30/26 step list dropped under the
+   34px section-heading floor at phone width, so the page title was the
+   smallest heading on /contact at 375px. */
+.contact-hero h1 {
+    margin: 14px 0;
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.12;
+    color: var(--heading-ink);
+}
+
+.contact-hero p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Two-column: info panel + form */
+.contact-layout {
+    max-width: 980px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 0.9fr 1fr;
+    gap: 48px;
+    align-items: start;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    padding-top: 8px;
+}
+
+.contact-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-info-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+}
+
+.contact-info-item a,
+.contact-info-item > span:not(.contact-info-label) {
+    font-size: 16px;
+    line-height: 1.55;
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.contact-info-item a:hover {
+    color: #264ea0;
+}
+
+.contact-info-sub {
+    font-size: 13px !important;
+    color: #888 !important;
+}
+
+/* Neutralise the shared <Contact> section styling inside the /contact layout
+   (it keeps its full padding + grey band on the home page) */
+.contact-page .contact {
+    padding: 0;
+    background: none;
+    display: block;
+}
+
+/* base .contact-box is already compact; on /contact just drop the min-height,
+   centring and outer margin so it sits cleanly in the grid column */
+.contact-page .contact-box {
+    min-height: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.contact-page .studio-location {
+    padding-top: 20px;
+}
+
+.contact-page .location-header {
+    margin-bottom: 40px;
+}
+
+.contact-page .location-header h2 {
+    font-size: 34px;
+}
+
+@media (max-width: 900px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 34px;
+        margin-top: 36px;
+    }
+}
+
+@media (max-width: 600px) {
+    .contact-hero {
+        margin-top: 28px;
+    }
+
+    .contact-page .contact-box {
+        max-width: none;
+        padding: 28px 20px;
+    }
+}
+
+/* ================= CONTACT ================= */
+
+.contact {
+    padding: 90px 20px;
+    background: linear-gradient(to bottom,
+            #f5f5f5,
+            #ececec);
+    display: flex;
+    justify-content: center;
+}
+
+/* The agreement checkbox, directly above the submit button.
+
+   The card is `text-align: center` (see .contact-box), which a two-column
+   flex row inherits and which would centre a wrapping second line under the
+   box instead of aligning it to the first. Hence the explicit `text-align:
+   left` — it is correcting an inherited value, not a preference.
+
+   `align-items: flex-start` and the 2px nudge: the box is 16px and the text
+   is 12.5px at 1.55, so centring the row floats the box below the first line
+   once the label wraps to two. */
+.form-consent-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 16px;
+    text-align: left;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #777;
+    cursor: pointer;
+}
+
+/* `input[type="checkbox"]`, not `input`.
+
+   `.contact-form input` further down this file sets width:100% plus the text
+   field's padding, border, radius and background. A bare `.form-consent-check
+   input` is (0,1,1) — the SAME specificity — so source order decided it and the
+   later generic rule won: the checkbox rendered 384px wide and crushed its own
+   label into a 63px column that overflowed the card. The attribute selector
+   takes this to (0,2,1) and wins on merit rather than on position.
+
+   The text-field paint is reset explicitly for the same reason — inheriting a
+   12px/15px padding and a #fafafa fill onto a 16px checkbox is what made it
+   look like an empty input rather than a tick box. */
+.form-consent-check input[type="checkbox"] {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    min-width: 0;
+    margin: 2px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    accent-color: #264ea0;
+    cursor: pointer;
+}
+
+.form-consent-check a {
+    color: #264ea0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Two links live INSIDE the <label>, which is safe: a label's activation
+   behaviour explicitly does nothing for events targeted at interactive
+   content descendants, so clicking Privacy Policy navigates without also
+   toggling the box. Wrapping them in the label is what lets the whole
+   sentence be the checkbox's accessible name. */
+.form-consent-check a:hover {
+    color: var(--primary-dark, #1d3c7a);
+}
+
+/* BOX */
+.contact-box {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+
+    background: #ffffff;
+    padding: 40px 38px 34px;
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.05),
+        0 40px 80px rgba(0, 0, 0, 0.06);
+}
+
+/* TEXT */
+
+/* `> span`, NOT `span`. This is the card's eyebrow ("GET FREE CONSULTATION")
+   and it is a direct child. Unscoped, it is (0,1,1) and reached INTO the form
+   to render the consent checkbox's label as 11px uppercase letter-spaced grey
+   text that overflowed the card — the seventh time a bare `.parent element`
+   selector has done this here. Found by screenshotting the form, not by
+   reading the CSS. */
+.contact-box > span {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: #999;
+    text-transform: uppercase;
+}
+
+.contact-box h2 {
+    font-size: 26px;
+    margin: 10px 0;
+    color: #111;
+    font-weight: 500;
+}
+
+.contact-box p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+/* FORM */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* INPUTS + SELECT BASE */
+
+
+.contact-form input,
+.contact-form textarea,
+.select-wrapper select {
+    width: 100%;
+    padding: 12px 15px;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+
+    font-size: 15px;
+    background: #fafafa;
+    color: #222;
+
+    transition: all 0.25s ease;
+}
+
+
+/* HOVER */
+.contact-form input:hover,
+.contact-form textarea:hover,
+.select-wrapper select:hover {
+    border-color: #bbb;
+}
+
+/* FOCUS */
+.contact-form input:focus,
+.contact-form textarea:focus,
+.select-wrapper select:focus {
+    border-color: #111;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+/* The textarea shares the input styling above; these are the two things a
+   <textarea> needs that an <input> does not. font-family: inherit stops it
+   falling back to the browser monospace default. */
+.contact-form textarea {
+    font-family: inherit;
+    resize: vertical;
+    min-height: 96px;
+}
+
+/* PLACEHOLDER */
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #aaa;
+}
+
+/* ================= SELECT ================= */
+
+.select-wrapper {
+    position: relative;
+}
+
+/* SELECT FIELD */
+.select-wrapper select {
+    padding: 15px 45px 15px 16px;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* PREMIUM ARROW */
+.select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+
+    width: 8px;
+    height: 8px;
+
+    border-right: 2px solid #777;
+    border-bottom: 2px solid #777;
+
+    transform: translateY(-50%) rotate(45deg);
+    pointer-events: none;
+}
+
+/* REMOVE UGLY FIRST OPTION */
+.select-wrapper select:invalid {
+    color: #aaa;
+}
+
+/* ================= BUTTON (UNCHANGED CORE) ================= */
+
+.contact-form button {
+    padding: 12px;
+    margin-top: 2px;
+
+    /* background: #111; */
+    background: #264ea0;
+    color: #fff;
+
+    border: none;
+    border-radius: 30px;
+
+    font-size: 14px;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ADD SMALL PREMIUM TOUCH */
+.contact-form button:hover {
+    background: #222;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+    .contact-box {
+        padding: 30px 20px;
+        border-radius: 14px;
+    }
+
+    .contact-box h2 {
+        font-size: 26px;
+    }
+
+    .contact-form {
+        gap: 14px;
+    }
+}

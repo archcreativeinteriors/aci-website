@@ -1,0 +1,76 @@
+/* SCROLL-TO-TOP — top of the floating right-hand column.
+   Stack order bottom-up: WhatsApp · call · email · scroll-top.
+   These four are positioned independently in four files, so `bottom` here has to
+   clear the email button's top edge (its own bottom + its own height) at EVERY
+   breakpoint. Getting this wrong is invisible until you scroll far enough for
+   this button to appear — it overlapped email on desktop and sat exactly on top
+   of WhatsApp at <=768px. Re-check all three bands if any button is resized. */
+.scroll-top-btn {
+    position: fixed;
+    /* email: bottom 170 + height 60 = 230, + 10 gap */
+    bottom: 240px;
+    right: 25px;
+
+    width: 58px;
+    height: 58px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #3450B4;
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform: translateY(20px);
+
+    transition: all .35s ease;
+
+    z-index: 999;
+    cursor: pointer;
+}
+
+
+
+.scroll-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+
+    .scroll-top-btn {
+        width: 70px;
+        height: 70px;
+
+        right: 18px;
+        /* email: bottom 182 + height 70 = 252, + 12 gap */
+        bottom: 264px;
+
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .scroll-top-btn {
+        width: 52px;
+        height: 52px;
+
+        right: 18px;
+        /* email: bottom 155 + height 52 = 207, + 8 gap */
+        bottom: 215px;
+
+        font-size: 20px;
+
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+}

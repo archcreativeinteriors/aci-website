@@ -1,0 +1,422 @@
+/* ================= /projects — typographic index (plan §7) =================
+   Replaces the thumbnail grid. At 187 near-identical salon interiors a grid
+   reads as a dump; an index shows one photo at a time and scrolls fast.
+
+   NOTE ON THE CANVAS: this page used to be white-on-#264ea0. The index needs a
+   light canvas — §14 specifies the row name turns *accent blue* on hover, which
+   is invisible on a blue background. Switched to the §5 palette. */
+
+.projects-page {
+    /* No background: the page canvas gradient (globals.css) shows through. */
+    padding: 80px 60px 120px;
+    min-height: 80vh;
+}
+
+/* ================= HEADER ================= */
+
+.projects-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+/* DIRECT CHILD ONLY, and that matters. Written as a bare
+   ".projects-header span" this rule is specificity 0,1,1 and silently beat
+   .pcountL (0,1,0) in the lede block below — so that paragraph rendered as
+   13px uppercase letter-spaced blue text. (It also beat `.pcountN`, the
+   editorial project total, which is why the bug was obvious at the time;
+   that element is gone but the trap is not.)
+   Source order across files does not help and neither would a media query;
+   the fix is to stop the selector reaching that far down. Same trap as the
+   client-logo grid (see CLAUDE.md > Known issues). */
+.projects-header > span {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--primary);
+    text-transform: uppercase;
+}
+
+.projects-header h1 {
+    margin-top: 14px;
+    font-size: clamp(30px, 4.4vw, 42px);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text);
+}
+
+/* ================= INDEX ================= */
+
+.project-index-wrap {
+    position: relative;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.project-index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #e4e7ec;
+}
+
+.project-row-wrap {
+    display: block;
+}
+
+.project-row {
+    display: grid;
+    grid-template-columns: 0 minmax(0, 1fr) 190px 130px 28px;
+    align-items: center;
+    gap: 20px;
+
+    padding: 19px 0;
+    border-bottom: 1px solid #e4e7ec;
+
+    text-decoration: none;
+    color: #111;
+
+    /* §14: shifts right 22px. Transform, not margin — no reflow per row. */
+    transition: transform 0.28s ease, border-color 0.28s ease;
+}
+
+.project-row:hover,
+.project-row:focus-visible {
+    transform: translateX(22px);
+    border-color: #264ea0;
+    outline: none;
+}
+
+.project-row-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    font-size: 19px;
+    font-weight: 700;
+    transition: color 0.28s ease;
+}
+
+.project-row:hover .project-row-name,
+.project-row:focus-visible .project-row-name {
+    color: #264ea0;
+}
+
+.project-row-badge {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 30px;
+    background: rgba(38, 78, 160, 0.1);
+    color: #264ea0;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.project-row-city {
+    font-size: 15px;
+    color: #666;
+}
+
+.project-row-state {
+    justify-self: start;
+    padding: 4px 12px;
+    border: 1px solid #e4e7ec;
+    border-radius: 30px;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+
+.project-row-arrow {
+    justify-self: end;
+    color: #264ea0;
+    font-size: 17px;
+    transition: transform 0.28s ease;
+}
+
+.project-row:hover .project-row-arrow,
+.project-row:focus-visible .project-row-arrow {
+    transform: translateX(6px);
+}
+
+/* Rows with no record behind them yet (§16 — 181 of 187 have no photograph).
+   Rendered as inert text, never a link to a page that does not exist. */
+.project-row--placeholder {
+    color: #98a2b3;
+    cursor: default;
+}
+
+.project-row--placeholder:hover {
+    transform: none;
+    border-color: #e4e7ec;
+}
+
+.project-row--placeholder .project-row-name {
+    font-weight: 500;
+    color: #98a2b3;
+}
+
+.project-row--placeholder .project-row-arrow {
+    visibility: hidden;
+}
+
+/* Desktop uses the floating preview, so the inline thumbnail collapses to a
+   zero-width grid column rather than being unmounted — no layout shift when
+   the breakpoint changes. */
+.project-row-thumb {
+    position: relative;
+    width: 0;
+    height: 46px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f4f6fa;
+}
+
+/* ================= FLOATING PREVIEW (progressive enhancement) ================= */
+
+.project-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+
+    width: 320px;
+    height: 240px;
+
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: rgba(38, 78, 160, 0.22) 0 8px 18px;
+
+    opacity: 0;
+    /* Never intercepts the pointer — the row underneath must stay clickable. */
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.project-preview.is-visible {
+    opacity: 1;
+}
+
+.project-preview-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    opacity: 0;
+    /* §14: preview panel cross-fades over 450ms. */
+    transition: opacity 0.45s ease;
+}
+
+.project-preview-layer.is-active {
+    opacity: 1;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+    .projects-page {
+        padding: 60px 32px 90px;
+    }
+
+    .project-row {
+        grid-template-columns: 0 minmax(0, 1fr) 150px 24px;
+    }
+
+    /* State tag is the first thing to go — city already implies it. */
+    .project-row-state {
+        display: none;
+    }
+}
+
+/* No hover here, so §7 puts a thumbnail on the row itself and the floating
+   preview never mounts (the component bails on `(hover: hover)`). */
+@media (max-width: 768px) {
+    .projects-page {
+        padding: 44px 18px 70px;
+    }
+
+    .projects-header {
+        margin-bottom: 40px;
+    }
+
+    .projects-header h1 {
+        font-size: 26px;
+    }
+
+    .project-row {
+        grid-template-columns: 64px minmax(0, 1fr);
+        grid-template-areas:
+            "thumb name"
+            "thumb city";
+        gap: 4px 14px;
+        padding: 14px 0;
+    }
+
+    .project-row:hover,
+    .project-row:focus-visible {
+        transform: none;
+    }
+
+    .project-row-thumb {
+        grid-area: thumb;
+        width: 64px;
+        height: 52px;
+    }
+
+    .project-row-name {
+        grid-area: name;
+        font-size: 16px;
+    }
+
+    .project-row-city {
+        grid-area: city;
+        font-size: 13px;
+    }
+
+    .project-row-arrow {
+        display: none;
+    }
+}
+
+/* §14: all motion off under reduced-motion. The preview still appears (it is
+   information, not decoration) — it just stops chasing the cursor and stops
+   sliding, which the component handles by anchoring it beside the row. */
+@media (prefers-reduced-motion: reduce) {
+
+    .project-row,
+    .project-row-name,
+    .project-row-arrow,
+    .project-preview,
+    .project-preview-layer {
+        transition: none;
+    }
+
+    .project-row:hover,
+    .project-row:focus-visible {
+        transform: none;
+    }
+
+    .project-row:hover .project-row-arrow,
+    .project-row:focus-visible .project-row-arrow {
+        transform: none;
+    }
+}
+
+/* ================= page lede (was §13's creative project count) =============
+   This was a number-and-label PAIR: the project total at clamp(48px, 6.4vw,
+   76px) beside a 15px two-line label, joined by a hairline in .pcountL::before.
+   The owner removed the project total site-wide on 2026-09-17, so `.pcountN` is
+   gone from the JSX and the three rules that existed only to serve it went with
+   it:
+
+     - `.pcountN` itself — no element left to style.
+     - `.pcountL::before` — the hairline said "this label belongs to that
+       number". With no number it is a rule floating to the left of a lone
+       sentence, which reads as a rendering fault, not as typography.
+     - `text-align: left` + `max-width: 24ch` — the label read left because it
+       sat beside a centred digit and needed a shared edge. Alone under a centred
+       <h1> it has to centre, or the header is centred with one line hanging off
+       to one side.
+
+   The 600px block that stacked the pair and hid the hairline went too: there is
+   nothing left to stack. Do not reinstate a figure here — see the comment in
+   projects/page.js. */
+
+.pcount {
+    display: flex;
+    /* .projects-header is text-align:center, but a flex container does not
+       inherit that for its items — without justify-content the whole block sat
+       hard left under a centred heading. Still true with one child. */
+    justify-content: center;
+    margin-top: var(--s3);
+}
+
+.pcountL {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 52ch;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .pcountL {
+        font-size: 15px;
+        max-width: 34ch;
+    }
+}
+
+/* ================= §15 filters =================
+   Rendered by components/ProjectFilters.jsx, which only exists once JS runs —
+   with no bundle there are no chips and the full index is still there. */
+
+/* Same 1180px measure as .project-index-wrap, and centred the same way. The
+   page pads to 60px but the index is a centred 1180px column, so chips left at
+   the page gutter started a long way outside the rows they filter — on a wide
+   screen the row of controls and the list it acts on did not share an edge. */
+.pfilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 1180px;
+    margin: var(--s3) auto 0;
+}
+
+.pchip {
+    font: inherit;
+    font-size: 13.5px;
+    padding: 9px 18px;
+    border-radius: var(--r-btn);
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color .2s var(--ease), background-color .2s var(--ease),
+        color .2s var(--ease);
+}
+
+.pchip span {
+    color: var(--muted);
+    margin-left: 4px;
+}
+
+.pchip:hover {
+    border-color: var(--primary);
+}
+
+.pchip.on {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.pchip.on span {
+    color: rgba(255, 255, 255, .7);
+}
+
+/* Was 14px above and nothing below, so it sat directly on the index's top
+   hairline and read as part of the first row rather than as a caption for the
+   chips above it. */
+.pfilterCount {
+    max-width: 1180px;
+    margin: 16px auto var(--s2);
+    font-size: 13.5px;
+    color: var(--muted);
+}
+
+.pfilterEmpty {
+    max-width: 1180px;
+    margin: var(--s2) auto;
+    padding: var(--s2) 0;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--muted);
+}
+
+/* `hidden` alone loses to any display rule on this element, so state it. */
+.project-row-wrap[hidden] {
+    display: none;
+}

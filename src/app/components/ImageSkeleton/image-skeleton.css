@@ -1,0 +1,107 @@
+/* ================= Image skeletons (shimmer while a photo loads) =================
+   See README.md in this folder: what it covers, how to test it, how to remove it.
+
+   ONLY two places, on purpose (owner, 2026-09-29):
+     1. the full-size photo viewer on /projects/[id]   (components/PhotoLightbox.jsx)
+     2. the hover preview on /projects                  (components/ProjectIndex.jsx)
+   Every other photo on the site already shows a blurred mini version of itself
+   while it loads (Sanity's LQIP via next/image `placeholder="blur"`), which is
+   better than grey, so it gets nothing from here. Client logos are skipped:
+   they are transparent PNGs, so a shimmer behind them would show through.
+
+   HOW IT SWITCHES OFF: each component sets data-skeleton="loading" on the
+   element while ITS image loads, and removes it on the image's load/error
+   event. Nothing here hides text or content — the shimmer is a background on
+   a box whose size is already fixed, so removing it moves nothing (no CLS).
+   Both places exist only when JavaScript runs, so no-JS visitors never see one.
+
+   Light theme only (the site has no dark mode). The viewer's version is dark
+   because the viewer itself is a dark full-screen panel. */
+
+:root {
+    --sk-base: #e6ecf6;       /* between --surface-soft and --bg */
+    --sk-shine: #f6f8fd;
+    --sk-dark-base: rgba(255, 255, 255, 0.06);
+    --sk-dark-shine: rgba(255, 255, 255, 0.14);
+}
+
+@keyframes skShimmer {
+    from {
+        background-position: 150% 0;
+    }
+
+    to {
+        background-position: -50% 0;
+    }
+}
+
+/* ---- 1. photo viewer: the <img> itself is the box.
+
+   Its final size is set BEFORE the photo arrives, so the shimmer has a box to
+   fill and nothing jumps when the photo lands: the photo fitted into the
+   viewer, i.e. the stage width, or the height limit times the photo's shape
+   (--lb-ratio = width / height, set by PhotoLightbox from Sanity's
+   dimensions). Without this an unloaded <img> is 0x0 there: the viewer's
+   `width: auto; height: auto` (project-detail.css) overrides the width/height
+   attributes until the photo has loaded. The height limits match .lbImg's
+   max-height in project-detail.css. A photo with no known size gets no
+   --lb-ratio, so these declarations are invalid and it keeps the old sizing.
+
+   Side effect, accepted: a photo whose original is smaller than the screen is
+   now scaled up to fit the viewer, as larger ones already were. */
+.lbImg {
+    --lb-maxh: calc(100vh - 140px);
+    width: min(100%, calc(var(--lb-maxh) * var(--lb-ratio)));
+    aspect-ratio: var(--lb-ratio);
+}
+
+@supports (height: 100dvh) {
+    .lbImg {
+        --lb-maxh: calc(100dvh - 140px);
+    }
+}
+
+@media (max-width: 680px) {
+    .lbImg {
+        --lb-maxh: calc(100vh - 156px);
+    }
+
+    @supports (height: 100dvh) {
+        .lbImg {
+            --lb-maxh: calc(100dvh - 156px);
+        }
+    }
+}
+
+/* While loading, the viewer's own fade-in is replaced by the shimmer; when the
+   attribute goes, the fade-in (lbFade) plays as the photo appears. */
+.lbImg[data-skeleton="loading"] {
+    background: linear-gradient(100deg, var(--sk-dark-base) 30%, var(--sk-dark-shine) 50%, var(--sk-dark-base) 70%);
+    background-color: var(--sk-dark-base);
+    background-size: 200% 100%;
+    animation: skShimmer 1.4s linear infinite;
+}
+
+/* ---- 2. /projects hover preview: the panel is a fixed 320x240 box. While the
+   hovered row's photo loads, the panel shows the shimmer and hides whichever
+   photo layer was up before, so another project's photo is never shown for
+   this row. The layers' own 450ms cross-fade brings the photo in. */
+.project-preview[data-skeleton="loading"] {
+    background: linear-gradient(100deg, var(--sk-base) 30%, var(--sk-shine) 50%, var(--sk-base) 70%);
+    background-color: var(--sk-base);
+    background-size: 200% 100%;
+    animation: skShimmer 1.4s linear infinite;
+}
+
+.project-preview[data-skeleton="loading"] .project-preview-layer {
+    opacity: 0;
+}
+
+/* Reduced motion: a still grey box, no sweep. */
+@media (prefers-reduced-motion: reduce) {
+    .lbImg[data-skeleton="loading"],
+    .project-preview[data-skeleton="loading"] {
+        animation: none;
+        background-image: none;
+    }
+}

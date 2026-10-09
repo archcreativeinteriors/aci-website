@@ -1,0 +1,511 @@
+/* ================= /projects/[id] =================
+   The reference demo's detail layout: photograph left, spec panel right, then
+   the written sections.
+
+   Replaced a full-bleed hero with the title in an overlay. At 192 near-identical
+   salon interiors the FACTS are what separate one project from the next, so the
+   spec panel sits beside the photograph rather than a screen-height image
+   pushing everything below the fold.
+
+   Class names are the demo's (.pd / .pdHero / .pdTitle / .spec) except where
+   they would collide; `.pdPage`, `.pdBody`, `.pdSection`, `.pdFeatures` are
+   ours. Nothing here reuses the old `.project-*` names — they are gone with the
+   old markup. */
+
+.pdPage {
+    padding-bottom: var(--s5);
+}
+
+.pd {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: var(--s4);
+    padding-top: var(--s2);
+    align-items: start;
+}
+
+.pdHero {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--surface-soft);
+    overflow: hidden;
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-soft);
+}
+
+/* ---- thumbnail strip ----
+   Four tiles under the hero, all of THIS project: gallery images where the
+   record has them, spec §26's "Photograph to be shot" state where it does not.
+   A photo tile links only to its own full-size photo (the viewer below), never
+   to another page — see the §26 note at the top of projects/[id]/page.js for
+   why other projects' photographs must never fill these slots. */
+
+.pdStripHead {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: var(--s3) 0 16px;
+}
+
+.pdStrip {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.pdShot {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--surface-soft);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--sh-soft);
+}
+
+/* An awaiting-photography slot: flat, no shadow, so it reads as a reserved
+   space rather than a card that failed to load an image. `.pcardEmpty` inside
+   it is the shared label from project-cards.css — one wording for this state
+   across the whole site. */
+.pdShot--empty {
+    box-shadow: none;
+    border: 1px dashed var(--border);
+    background: var(--surface-soft);
+}
+
+/* ---- photos open full size ----
+   Every photo (hero, gallery, before) is an <a class="pdZoom"> to its full-size
+   version; components/PhotoLightbox.jsx opens it in the viewer. On hover the
+   photo zooms slightly inside its frame and an expand badge appears; on touch
+   screens (no hover) the badge is always shown, so the tap is discoverable. */
+
+.pdHeroLink {
+    position: absolute;
+    inset: 0;
+    display: block;
+}
+
+.pdZoom {
+    cursor: zoom-in;
+    color: inherit;
+    text-decoration: none;
+}
+
+.pdZoom img {
+    transition: transform .5s var(--ease);
+}
+
+.pdZoom:hover img,
+.pdZoom:focus-visible img {
+    transform: scale(1.04);
+}
+
+.pdZoom:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.pdZoomIcon {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: var(--heading-ink);
+    box-shadow: var(--sh-deep);
+    opacity: 0;
+    transform: scale(.85);
+    transition: opacity .25s var(--ease), transform .25s var(--ease);
+    pointer-events: none;
+}
+
+.pdZoom:hover .pdZoomIcon,
+.pdZoom:focus-visible .pdZoomIcon {
+    opacity: 1;
+    transform: none;
+}
+
+/* The small thumbnails get a smaller badge. */
+.pdShot .pdZoomIcon {
+    right: 8px;
+    bottom: 8px;
+    width: 30px;
+    height: 30px;
+}
+
+.pdShot .pdZoomIcon svg {
+    width: 15px;
+    height: 15px;
+}
+
+@media (hover: none) {
+    .pdZoomIcon {
+        opacity: .9;
+        transform: none;
+    }
+}
+
+/* ---- the full-size viewer (components/PhotoLightbox.jsx) ----
+   A native modal <dialog>: it sits in the top layer, above the fixed header,
+   the floating buttons and the cookie banner, with no z-index needed. */
+
+/* The page behind stops scrolling; the gutter keeps the layout from jumping
+   when the scrollbar goes. */
+html.lbOpen {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+}
+
+.lb {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(8, 11, 20, .94);
+    color: #fff;
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+.lb::backdrop {
+    background: transparent;
+}
+
+.lb[open] {
+    animation: lbFade .2s ease-out;
+}
+
+.lbStage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 64px 88px 76px;
+}
+
+.lbImg {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 140px);
+    max-height: calc(100dvh - 140px);
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    animation: lbFade .25s ease-out;
+}
+
+.lbBtn {
+    position: absolute;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.lbBtn:hover {
+    background: rgba(255, 255, 255, .24);
+}
+
+.lbBtn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+.lbClose {
+    top: 12px;
+    right: 16px;
+}
+
+.lbPrev,
+.lbNext {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.lbPrev {
+    left: 20px;
+}
+
+.lbNext {
+    right: 20px;
+}
+
+.lbCaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 16px;
+    padding: 0 16px 24px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, .85);
+    text-align: center;
+    pointer-events: none;
+}
+
+.lbCount {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, .6);
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes lbFade {
+    from {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pdZoom img,
+    .pdZoomIcon {
+        transition: none;
+    }
+
+    .pdZoom:hover img,
+    .pdZoom:focus-visible img {
+        transform: none;
+    }
+
+    .lb[open],
+    .lbImg {
+        animation: none;
+    }
+}
+
+/* Phones: the arrows move to the bottom corners, beside the caption, so the
+   photo gets the full width (swiping also works). */
+@media (max-width: 680px) {
+    .lbStage {
+        padding: 60px 8px 96px;
+    }
+
+    .lbImg {
+        max-height: calc(100vh - 156px);
+        max-height: calc(100dvh - 156px);
+    }
+
+    .lbPrev,
+    .lbNext {
+        top: auto;
+        bottom: 16px;
+        transform: none;
+    }
+
+    .lbPrev {
+        left: 12px;
+    }
+
+    .lbNext {
+        right: 12px;
+    }
+
+    .lbCaption {
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 0 72px 22px;
+        font-size: 13.5px;
+    }
+}
+
+
+/* ---- spec panel ---- */
+
+.pdBrand {
+    display: inline-block;
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+
+/* Anchor-only: the eyebrow renders as a plain <span> for brands below the
+   collection-page threshold, and a hover underline on non-link text is a
+   false affordance. */
+a.pdBrand:hover {
+    text-decoration: underline;
+}
+
+.pdTitle {
+    font-size: clamp(26px, 3.2vw, 32px);
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.spec {
+    border-top: 1px solid var(--border);
+    margin-top: var(--s2);
+}
+
+.spec > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+}
+
+.spec dt {
+    color: var(--muted);
+}
+
+.spec dd {
+    text-align: right;
+    font-weight: 500;
+    margin: 0;
+}
+
+.pdMore {
+    margin-top: var(--s2);
+    font-size: 14.5px;
+}
+
+/* ---- written sections ---- */
+
+/* Sits INSIDE .wrapx, not on it. Sharing one element gave this max-width to the
+   wrapx box, whose `margin: 0 auto` then centred the whole text column away
+   from the photograph above it. */
+.pdBody {
+    max-width: 68ch;
+    padding-top: var(--s4);
+}
+
+/* The gap before the next heading has to beat the gap a heading leaves above
+   its own paragraph, or the two run together and the page reads as one block of
+   text with big words in it — which is what it did at --s3 (40px) against a
+   1.75 line-height. 64px against 16px is the whole rhythm here.
+   Three of the sections are wrapped in <ScrollReveal>'s <div data-reveal>, so
+   `.pdSection + .pdSection` never matched and every heading sat on the
+   paragraph above it — the gap goes on whichever box is the direct child. */
+.pdBody > * + :is(.pdSection, [data-reveal]) {
+    margin-top: 64px;
+}
+
+.pdSection h2 {
+    font-size: clamp(21px, 2vw, 25px);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.pdSection p {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--muted);
+}
+
+/* Key features is a list, not prose — it needs less air above it than a
+   paragraph does. */
+.pdSection .pdFeatures {
+    margin-top: 4px;
+}
+
+.pdFeatures {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+}
+
+.pdFeatures li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.pdFeatures li > svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+    color: var(--primary);
+}
+
+.pdBack {
+    margin-top: var(--s3);
+}
+
+/* ---- breakpoints (demo: single column at 1000) ---- */
+
+@media (max-width: 1000px) {
+    .pd {
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+    }
+
+    .pdBody {
+        padding-top: var(--s3);
+    }
+
+    .pdBody > * + :is(.pdSection, [data-reveal]) {
+        margin-top: 48px;
+    }
+}
+
+@media (max-width: 680px) {
+    .pdFeatures {
+        grid-template-columns: 1fr;
+    }
+
+    /* The demo drops the strip to 2-up here; four tiles across a phone are
+       postage stamps. */
+    .pdStrip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* The State value links to /projects/state/<state>. Reads as the plain value;
+   the underline shows on hover and on keyboard focus. */
+.spec dd .specLink {
+    color: inherit;
+    text-decoration: none;
+}
+
+.spec dd .specLink:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+    .spec dd .specLink:hover {
+        color: var(--primary);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+}

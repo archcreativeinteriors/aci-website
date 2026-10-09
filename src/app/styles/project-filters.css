@@ -1,0 +1,126 @@
+/* =========================================================
+   /projects sector chips — components/ProjectFilters.jsx.
+   Every selector is prefixed `pf-`. The old `.pfilters` /
+   `.pchip` rules in projects.css are no longer used by it.
+
+   One navy pill (.pf-pill) sits behind the chips and slides
+   to the active one; the chips themselves never change
+   colour except their text. Layers, inside .pf-group's own
+   stacking context: chip white fill (::before) < pill <
+   chip label.
+   ========================================================= */
+
+.pf-group {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 1180px;
+    margin: var(--s3) auto 0;
+}
+
+.pf-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-size: 13.5px;
+    line-height: 1.2;
+    padding: 9px 18px;
+    border-radius: var(--r-btn);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color .3s var(--ease), color .3s var(--ease),
+        transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.pf-chip::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -2;
+    border-radius: inherit;
+    background: #fff;
+}
+
+.pf-icon,
+.pf-label {
+    position: relative;
+    z-index: 1;
+}
+
+.pf-icon {
+    flex: none;
+    color: var(--primary);
+    transition: color .3s var(--ease);
+}
+
+.pf-chip:hover {
+    border-color: var(--primary);
+}
+
+.pf-chip:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.pf-chip.on {
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.pf-chip.on .pf-icon {
+    color: #fff;
+}
+
+.pf-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 0;
+    height: 0;
+    border-radius: var(--r-btn);
+    background: var(--primary);
+    pointer-events: none;
+}
+
+/* Until the pill has been placed, the active chip fills itself, so white text
+   never sits on white. */
+.pf-group:not(.pf-ready) .pf-chip.on::before {
+    background: var(--primary);
+}
+
+.pf-ready .pf-pill {
+    transition: transform .3s var(--ease), width .3s var(--ease), height .3s var(--ease);
+}
+
+/* A border change alone was hard to see (owner, 2026-10-07): an unselected
+   chip also lifts, glows softly and turns its label blue. Mouse only. The
+   selected chip stays put — the pill under it does not follow a lift. */
+@media (hover: hover) {
+    .pf-chip:not(.on):hover {
+        color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px -6px rgba(38, 78, 160, .35);
+    }
+}
+
+/* The hover border sticks after a tap on touch devices. */
+@media (hover: none) {
+    .pf-chip:not(.on):hover {
+        border-color: var(--border);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pf-chip,
+    .pf-icon,
+    .pf-ready .pf-pill {
+        transition: none;
+    }
+}

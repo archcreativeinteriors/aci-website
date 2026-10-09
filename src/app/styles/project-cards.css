@@ -1,0 +1,157 @@
+/* ================= PROJECT CARDS + GRID =================
+   The shared primitives (spec §7, §29, §32): components/ProjectCard.jsx and
+   components/ProjectGrid.jsx. Every page that shows project tiles uses these,
+   so the breakpoints are defined once here rather than per page.
+
+   §29 columns: desktop 4 / tablet 3 / mobile 2. */
+
+.pgrid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s3) var(--s2);
+}
+
+.pcard {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* A row with no detail page is an <article>, not a link — the cursor must not
+   promise a destination that does not exist. */
+.pcard--static {
+    cursor: default;
+}
+
+.pcardFrame {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--surface-soft);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    box-shadow: var(--sh-soft);
+}
+
+.pcardFrame img {
+    transition: transform .55s var(--ease);
+}
+
+.pcard:hover .pcardFrame img,
+.pcard:focus-visible .pcardFrame img {
+    transform: scale(1.06);
+}
+
+/* §26 — the "no approved photograph" state. Deliberate, never a broken image,
+   never another project's photo standing in. */
+.pcardEmpty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 18px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* §8 — hover only REPEATS the format, which is also implicit in the name. No
+   information lives here alone, so touch devices lose nothing. */
+.pcardVeil {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 18px;
+    color: #fff;
+    font-size: 13px;
+    background: linear-gradient(transparent, rgba(21, 21, 21, .85));
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .3s var(--ease), transform .3s var(--ease);
+}
+
+.pcard:hover .pcardVeil,
+.pcard:focus-visible .pcardVeil {
+    opacity: 1;
+    transform: none;
+}
+
+/* §30 — a visible focus ring on the card itself, not just the browser default
+   around an inline box. */
+.pcard:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: var(--r-card);
+}
+
+.pcardName {
+    display: block;
+    margin-top: 14px;
+    font-size: 15.5px;
+    font-weight: 500;
+    line-height: 1.35;
+    transition: color .2s var(--ease);
+}
+
+.pcard:hover .pcardName {
+    color: var(--primary);
+}
+
+.pcardLoc {
+    display: block;
+    margin-top: 3px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.pcardState {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--muted);
+    opacity: .75;
+}
+
+/* §8 / §30 — reduced motion cancels the zoom and the veil slide. The veil still
+   appears, it just does not travel. */
+@media (prefers-reduced-motion: reduce) {
+
+    .pcardFrame img,
+    .pcardVeil {
+        transition: none;
+    }
+
+    .pcard:hover .pcardFrame img,
+    .pcard:focus-visible .pcardFrame img {
+        transform: none;
+    }
+}
+
+/* Hover styling sticks after a tap on touch devices. */
+@media (hover: none) {
+    .pcardVeil {
+        display: none;
+    }
+}
+
+/* ---- §29 breakpoints ---- */
+
+@media (max-width: 1000px) {
+    .pgrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .pgrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--s2) 14px;
+    }
+
+    .pcardName {
+        margin-top: 10px;
+        font-size: 14.5px;
+    }
+}

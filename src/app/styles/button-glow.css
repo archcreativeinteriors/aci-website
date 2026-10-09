@@ -1,0 +1,244 @@
+/* ================= .bGlow — the primary enquiry button =================
+   A radial gradient whose centre, spread, stops and colours all ANIMATE on
+   hover, so the light appears to swell and sweep across the pill rather than
+   the fill simply changing. That motion is the whole effect and it is only
+   possible because the custom properties below are registered with @property:
+   an unregistered custom property is an untyped string and cannot be
+   transitioned, so the same rules without these declarations would snap.
+
+   Registered names are GLOBAL. They are --g* here, deliberately not --bg*,
+   because --bg is the page-canvas token in globals.css.
+
+   PALETTE: every stop is a shade of --primary. The source design used navy ->
+   teal -> lime, which would have put two new accent colours on the site
+   against the one rule the token block states outright ("do not add a second
+   accent colour"). A blue-on-blue glow keeps the motion and loses nothing.
+
+   NOT a <button>: these navigate to /contact, so they stay <Link>s. A <button>
+   would have cost middle-click, "open in new tab" and the status-bar preview.
+
+   DEGRADATION: where @property is unsupported (Firefox < 128, Safari < 16.4)
+   the gradient still renders from the declared values and hover still changes
+   it - just instantly, with no tween. Nothing breaks. */
+
+@property --gx {
+    syntax: "<percentage>";
+    initial-value: 40%;
+    inherits: false;
+}
+
+@property --gy {
+    syntax: "<percentage>";
+    initial-value: 140%;
+    inherits: false;
+}
+
+@property --gsx {
+    syntax: "<percentage>";
+    initial-value: 130%;
+    inherits: false;
+}
+
+@property --gsy {
+    syntax: "<percentage>";
+    initial-value: 170%;
+    inherits: false;
+}
+
+@property --gc1 {
+    syntax: "<color>";
+    initial-value: #0d1c38;
+    inherits: false;
+}
+
+@property --gc2 {
+    syntax: "<color>";
+    initial-value: #1b3a78;
+    inherits: false;
+}
+
+@property --gc3 {
+    syntax: "<color>";
+    initial-value: #264ea0;
+    inherits: false;
+}
+
+@property --gc4 {
+    syntax: "<color>";
+    initial-value: #5b8ada;
+    inherits: false;
+}
+
+@property --gc5 {
+    syntax: "<color>";
+    initial-value: #0b1730;
+    inherits: false;
+}
+
+@property --gs1 {
+    syntax: "<percentage>";
+    initial-value: 37.35%;
+    inherits: false;
+}
+
+@property --gs2 {
+    syntax: "<percentage>";
+    initial-value: 61.36%;
+    inherits: false;
+}
+
+@property --gs3 {
+    syntax: "<percentage>";
+    initial-value: 78.42%;
+    inherits: false;
+}
+
+@property --gs4 {
+    syntax: "<percentage>";
+    initial-value: 93.52%;
+    inherits: false;
+}
+
+@property --gs5 {
+    syntax: "<percentage>";
+    initial-value: 100%;
+    inherits: false;
+}
+
+@property --gba {
+    syntax: "<angle>";
+    initial-value: 180deg;
+    inherits: false;
+}
+
+.bGlow {
+    position: relative;
+    /* Metrics deliberately identical to .bWhite / .bGhost in home.css — these
+       buttons sit next to each other in the CTA band. If you change one set,
+       change both. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 32px;
+    border-radius: var(--r-btn);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    overflow: hidden;
+    /* keeps the pseudo-elements' stacking to this button */
+    isolation: isolate;
+    /* The light stop (--gc4) is a rim highlight, not the ground under the
+       label - the label sits over --primary/--primary-dark, 8:1 and 11:1. This
+       keeps it legible if the rim ever drifts under a descender. */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    background:
+        radial-gradient(var(--gsx) var(--gsy) at var(--gx) var(--gy),
+            var(--gc1) var(--gs1),
+            var(--gc2) var(--gs2),
+            var(--gc3) var(--gs3),
+            var(--gc4) var(--gs4),
+            var(--gc5) var(--gs5));
+    transition:
+        --gx .75s, --gy .75s, --gsx .75s, --gsy .75s,
+        --gc1 .75s, --gc2 .75s, --gc3 .75s, --gc4 .75s, --gc5 .75s,
+        --gs1 .75s, --gs2 .75s, --gs3 .75s, --gs4 .75s, --gs5 .75s,
+        --gba .75s,
+        transform .25s var(--ease), box-shadow .3s var(--ease);
+}
+
+.bGlow:hover,
+.bGlow:focus-visible {
+    --gx: 0%;
+    --gy: 120%;
+    --gsx: 110%;
+    --gsy: 110%;
+    /* the light and the dark trade places, which is what reads as a sweep */
+    --gc2: #5b8ada;
+    --gc4: #1b3a78;
+    --gs1: 0%;
+    --gs2: 10%;
+    --gs3: 40%;
+    --gs4: 82%;
+    --gs5: 150%;
+    --gba: 190deg;
+    transform: translateY(-2px);
+    box-shadow: var(--sh-mid);
+}
+
+.bGlow:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+/* Hairline gradient ring. mask-composite cuts the centre out of a filled box,
+   which is how you get a GRADIENT border - border-image cannot follow a
+   border-radius. z-index keeps it under the label (see .bGlow isolation). */
+.bGlow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(var(--gba),
+            rgba(255, 255, 255, .65),
+            rgba(255, 255, 255, .15));
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* The sheen. Runs ONCE per hover, not on a loop: this site has exactly two
+   non-user-triggered animation (the home hero cross-fade) and that is
+   a deliberate limit. The source design span span::before spins forever. */
+.bGlow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    z-index: -1;
+    width: 42%;
+    background: linear-gradient(100deg,
+            transparent,
+            rgba(255, 255, 255, .30),
+            transparent);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.bGlow:hover::after {
+    opacity: 1;
+    animation: bGlowSheen 1.05s var(--ease);
+}
+
+@keyframes bGlowSheen {
+    to {
+        left: 115%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .bGlow {
+        transition: none;
+    }
+
+    .bGlow:hover::after {
+        animation: none;
+        opacity: 0;
+    }
+}
+
+/* No mobile min-height override: the 48px above already clears §5's 44px tap
+   target at every width. */

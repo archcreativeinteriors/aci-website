@@ -1,0 +1,28 @@
+/* =========================================================
+   Brand page, no photographs yet — components/brand/
+   BrandCuratedNotice.jsx. Every selector is prefixed `bc-`.
+   ========================================================= */
+
+.bc-notice {
+    max-width: 640px;
+    padding: var(--s3);
+    border: 1px dashed var(--border);
+    border-radius: var(--r-card);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.bc-notice__text {
+    margin: 0;
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.35;
+    color: var(--heading-ink);
+}
+
+.bc-notice__actions {
+    margin: var(--s3) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+}

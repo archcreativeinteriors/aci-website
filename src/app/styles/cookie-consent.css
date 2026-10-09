@@ -1,0 +1,306 @@
+/* ================= CONSENT BANNER + MAP GATE =================
+
+   Two pieces: the bottom-left banner, and the placeholder that stands in for
+   the Google Maps iframe until consent is given.
+
+   POSITIONING IS CONSTRAINED BY THE FLOATING BUTTON TOWER, not by taste. Four
+   fixed buttons stack up the right-hand edge (WhatsApp / call / email /
+   scroll-top), 298px tall on desktop at right:25, 334px at <=768 and 267px at
+   <=480, all documented in CLAUDE.md. The banner is therefore anchored BOTTOM
+   LEFT with `right: auto` on desktop, so the two never meet.
+   Below 768px the banner spans the gutters and DOES cover the lower buttons
+   while it is open. That is accepted, not overlooked: it is dismissed by a
+   single click and the buttons return. Do not "fix" it by moving the banner up
+   — a consent bar floating mid-screen reads as an error. */
+
+/* The scrim. Dims and blurs the page until a choice is made.
+
+   z-index 1001 puts it over the floating button tower (1000) and under the
+   dialog (1002), so the WhatsApp/call/email buttons dim with everything else
+   instead of floating brightly on top of a dimmed page.
+
+   `pointer-events` is left at its default so it swallows clicks on the page
+   behind — that is the blocking part. It has NO click handler: dismissing on
+   an outside click would record no choice while appearing to, which is the
+   pattern this dialog exists to avoid.
+
+   It is rendered by CookieConsent, which is mount-gated, so it can never reach
+   the SSR HTML. A server-rendered scrim with no JS to remove it would lock
+   every visitor out of the whole site. */
+.ccScrim {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(8, 16, 38, .55);
+    /* -webkit- first: Safari still needs the prefix for backdrop-filter. */
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    animation: ccFade .28s var(--ease) both;
+}
+
+@keyframes ccFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Lock the page behind the dialog. `:has()` rather than a class toggled from
+   JS, matching how navbar.css already locks scroll for the mobile menu
+   (`body:has(.nav-toggle:checked)`). Progressive: without :has the page still
+   scrolls behind the scrim, which is untidy but not broken. */
+body:has(.ccScrim) {
+    overflow: hidden;
+}
+
+/* The site's third non-user-triggered animation, and the only one that is a
+   response to arriving. Reduced motion gets the scrim with no fade — hiding it
+   entirely would unblock the page, which is not what the preference asks for. */
+@media (prefers-reduced-motion: reduce) {
+
+    .ccScrim,
+    .ccBar {
+        animation: none;
+    }
+}
+
+.ccBar {
+    animation: ccRise .32s var(--ease) both;
+}
+
+@keyframes ccRise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* The dialog is focused on open (it carries tabIndex={-1}), and a focus ring
+   on a whole panel reads as an error state. The ring belongs on the controls,
+   which keep theirs. */
+.ccBar:focus {
+    outline: none;
+}
+
+.ccBar {
+    position: fixed;
+    left: 18px;
+    right: auto;
+    bottom: 18px;
+    z-index: 1002;
+    /* above the floating tower (1000) so it is never half-hidden */
+
+    width: min(430px, calc(100vw - 36px));
+    box-sizing: border-box;
+    padding: 20px 22px;
+
+    background: var(--primary);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: var(--r-card);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+}
+
+.ccTitle {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.ccBody {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    /* .7, not .5 — on this mid-blue ground .5 measures ~3.2:1 and fails AA.
+       The footer's alphas exist for the same reason; see CLAUDE.md Phase 18.8.
+       Do not unify these with .ctaBand's, which sits on a dark ground. */
+    color: rgba(255, 255, 255, .78);
+}
+
+.ccBody a {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.ccActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Accept and Decline are the SAME size and the same weight. Only the fill
+   differs, and that is so the two are distinguishable, not so one is louder. */
+.ccBtn {
+    flex: 1 1 auto;
+    min-width: 120px;
+    padding: 10px 18px;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .4px;
+
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid #fff;
+    border-radius: 999px;
+    cursor: pointer;
+
+    transition: background .25s var(--ease), color .25s var(--ease);
+}
+
+.ccBtn:hover {
+    background: rgba(255, 255, 255, .88);
+}
+
+.ccBtn--ghost {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, .55);
+}
+
+.ccBtn--ghost:hover {
+    background: rgba(255, 255, 255, .12);
+}
+
+.ccBtn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+    .ccBar {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        width: auto;
+        padding: 18px;
+    }
+}
+
+/* ================= MAP GATE =================
+   The placeholder shown in place of the iframe. It is sized by the SAME rules
+   as the iframe it replaces — `.mapGate` was added to the existing
+   `.footer-map iframe` and `.location-map iframe` selectors in footer.css and
+   studio-location.css rather than being given its own box here. Swapping the
+   real map in must not move anything. */
+
+.mapGate {
+    position: relative;
+    /* the footer's copy re-declares this as absolute; either value contains
+       the fill image, so both work */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* The decorative backdrop. alt="" + aria-hidden in the JSX — it is scenery
+   standing in for the map, not a picture of the studio (there is no
+   photograph of the studio; see the note in MapEmbed.jsx). */
+.mapGateImg {
+    z-index: 0;
+    object-fit: cover;
+}
+
+/* Scrim. Without it the white text sits on whatever the photograph happens to
+   be under it — here a pale floor, which measured unreadable. A flat tint is
+   enough because the gate's content is centred rather than edge-anchored. */
+.mapGate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg,
+            rgba(12, 22, 48, .62) 0%,
+            rgba(12, 22, 48, .74) 100%);
+}
+
+/* Everything real sits above the scrim. */
+.mapGateText,
+.mapGateBtn,
+.mapGateLink {
+    position: relative;
+    z-index: 2;
+}
+
+.mapGateText {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: 30ch;
+}
+
+.mapGateBtn {
+    padding: 9px 18px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .25s var(--ease), color .25s var(--ease);
+}
+
+.mapGateLink {
+    font-size: 12.5px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ONE theme for both gates, not two.
+
+   Before the backdrop they sat on different grounds — the footer's blue and
+   StudioLocation's light card — and were coloured separately. Both now sit on
+   the same photograph behind the same scrim, so the ground is identical and a
+   second theme would only be a second thing to keep in step. */
+.mapGate {
+    color: rgba(255, 255, 255, .88);
+}
+
+.mapGateBtn {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid #fff;
+}
+
+/* Was a 14% fade of the white, too faint to notice (owner, 2026-10-07): fill
+   with the brand blue instead, as the nav's "Get Free Consultation" does. */
+.mapGateBtn:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.mapGateLink {
+    color: rgba(255, 255, 255, .88);
+}
+
+.mapGateLink:hover {
+    color: #fff;
+}
+
+/* The studio card has room for the fuller sentence; the footer column does not. */
+.location-map .mapGateText {
+    font-size: 14px;
+    max-width: 34ch;
+}
+
+/* The footer's "Cookie settings" control. A <button>, because it opens a
+   dialog rather than navigating — but it sits in a row of links, so it is set
+   like one. Resetting the UA button styles is what makes that possible. */
+.footer-legal button {
+    padding: 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* Same hover as its neighbours, Privacy Policy and Terms (footer.css). */
+.footer-legal button:hover {
+    color: #fff;
+    text-decoration: underline;
+}

@@ -1,0 +1,37 @@
+/* =========================================================
+   BrandPlaceholder — components/BrandPlaceholder.jsx.
+   Every selector is prefixed `bp`. Fills its (positioned,
+   rounded, overflow-hidden) parent exactly. Sized from its
+   own box with container units, so the same rule fits a
+   64px row thumbnail and the tall home preview.
+   ========================================================= */
+
+.bp {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    container-type: size;
+    color: rgba(255, 255, 255, 0.08);
+    background:
+        radial-gradient(120% 90% at 85% 10%, rgba(64, 104, 190, 0.55), transparent 60%),
+        linear-gradient(160deg, #2b4a8f 0%, var(--heading-ink) 100%);
+}
+
+.bp__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.bp__initials {
+    position: relative;
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: 58cqmin;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.13);
+    user-select: none;
+}

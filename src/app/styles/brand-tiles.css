@@ -1,0 +1,338 @@
+/* =========================================================
+   Brand tiles — blurred project photo + frosted glass panel
+   Every selector is prefixed with .bt- so nothing else on
+   the site is affected. No global, :root, or body styles.
+   Used by components/home/BrandWall.jsx.
+   ========================================================= */
+ 
+.bt-grid {
+  /* Matched to the site's own tokens (globals.css / layout.js). */
+  --bt-navy: var(--primary);        /* #264ea0, the header navy        */
+  --bt-page: var(--tone-tint);      /* the section's tint background   */
+  --bt-serif: var(--font-newsreader), Georgia, serif; /* heading font */
+  /* "Option 1: Navy + Champagne + Ivory" (owner, 2026-10-05). Ivory and
+     beige carry the tiles; the site blue (--primary, unchanged) is only the
+     interactive accent, champagne the hover accent. */
+  --bt-deep: #17366f;               /* deep navy: the CTA text, hover icon */
+  --bt-champagne: #d8c29d;          /* hover accent                     */
+  --bt-ivory: 246, 241, 232;        /* #f6f1e8 warm ivory, rgb triplet  */
+  --bt-beige: #e6d9c7;              /* soft beige: panel border         */
+  --bt-text: #242424;               /* brand names                      */
+  --bt-muted: #77736d;              /* secondary text                   */
+  --bt-edge: rgba(216, 194, 157, 0.45); /* champagne hairline round a tile */
+  --bt-shadow: rgba(23, 54, 111, 0.08); /* deep navy, very soft         */
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 170px;
+  gap: 14px;
+}
+.bt-grid__item {
+  display: flex;
+  min-width: 0;
+}
+.bt-grid__item--featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+ 
+/* ---------- Card ---------- */
+.bt-card {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--bt-text);
+  background: rgb(var(--bt-ivory));
+  box-shadow: 0 0 0 1px var(--bt-edge), 0 8px 20px -10px var(--bt-shadow);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.bt-card *,
+.bt-card *::before,
+.bt-card *::after {
+  box-sizing: border-box;
+}
+ 
+/* Photo: blurred at rest */
+.bt-card__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  object-fit: cover;
+  filter: blur(7px) saturate(0.75) brightness(0.9);
+  transform: scale(1.18); /* hides blurred edges */
+  transition: filter 0.6s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+ 
+/* A light ivory wash: the blurred photo still shows through, warmed */
+.bt-card__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(var(--bt-ivory), 0.6) 0%,
+    rgba(var(--bt-ivory), 0.25) 55%,
+    rgba(var(--bt-ivory), 0.4) 100%
+  );
+  transition: opacity 0.5s ease;
+}
+ 
+/* Hover / active: photo comes into focus */
+.bt-card:hover .bt-card__bg,
+.bt-card.is-active .bt-card__bg {
+  filter: blur(0) saturate(1.05) brightness(1);
+  transform: scale(1.04);
+}
+.bt-card:hover .bt-card__shade,
+.bt-card.is-active .bt-card__shade {
+  opacity: 0.35;
+}
+.bt-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 1px var(--bt-edge), 0 16px 32px -12px rgba(23, 54, 111, 0.16);
+}
+.bt-card:focus-visible {
+  outline: 2px solid var(--bt-navy);
+  outline-offset: 3px;
+}
+/* The tile the preview shows: a blue ring, the one blue frame in the grid. */
+.bt-card.is-active {
+  box-shadow: 0 0 0 2px var(--bt-page), 0 0 0 4px var(--bt-navy),
+    0 16px 32px -12px rgba(23, 54, 111, 0.16);
+}
+ 
+/* ---------- Round arrow (right of the glass panel) ----------
+   Replaced the project count (owner, 2026-10-01). Two arrows share one
+   round clip: on hover / focus the first leaves up-right and the second
+   slides in from bottom-left. */
+.bt-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bt-card__arrow {
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--bt-navy);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.bt-card__arrowIcon {
+  transition: transform 0.35s ease;
+}
+.bt-card__arrowIcon--next {
+  position: absolute;
+  transform: translate(-150%, 150%);
+}
+.bt-card:hover .bt-card__arrow,
+.bt-card:focus-visible .bt-card__arrow {
+  background: var(--bt-champagne);
+  color: var(--bt-deep);
+}
+.bt-card:hover .bt-card__arrowIcon,
+.bt-card:focus-visible .bt-card__arrowIcon {
+  transform: translate(150%, -150%);
+}
+.bt-card:hover .bt-card__arrowIcon--next,
+.bt-card:focus-visible .bt-card__arrowIcon--next {
+  transform: none;
+}
+ 
+/* ---------- Frosted glass info panel ---------- */
+.bt-card__glass {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(var(--bt-ivory), 0.9);
+  border: 1px solid var(--bt-beige);
+  box-shadow: 0 6px 18px -10px var(--bt-shadow);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  transition: background 0.3s ease;
+}
+/* In focus the photo behind the panel is sharp: a touch more ivory so the
+   text keeps its contrast. */
+.bt-card:hover .bt-card__glass,
+.bt-card.is-active .bt-card__glass {
+  background: rgba(var(--bt-ivory), 0.94);
+}
+.bt-card__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* Up to two lines, then an ellipsis — never cut to "Preet We…" on one line.
+   The panel grows with it; the arrow keeps its own column. */
+.bt-card__name {
+  font-family: var(--bt-serif);
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: var(--bt-text);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.bt-card__cat {
+  font-size: 0.74rem;
+  color: var(--bt-muted);
+  margin-top: 2px;
+}
+.bt-card__cat:empty {
+  display: none;
+}
+/* "Explore more", which becomes "Step inside" on hover / focus: both lines
+   share one grid cell, so the swap never changes the panel's size. */
+.bt-card__cta {
+  display: grid;
+  min-width: 0;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bt-deep);
+  white-space: nowrap;
+}
+.bt-card__ctaRest,
+.bt-card__ctaHover {
+  grid-area: 1 / 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.bt-card__ctaHover {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.bt-card:hover .bt-card__ctaRest,
+.bt-card:focus-visible .bt-card__ctaRest {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.bt-card:hover .bt-card__ctaHover,
+.bt-card:focus-visible .bt-card__ctaHover {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- No photograph: BrandPlaceholder ----------
+   (components/BrandPlaceholder.jsx, styles/brand-placeholder.css). On a tile
+   it sits where the photo would, behind the shade and the glass panel; its
+   initials ride a little high so the panel does not cover them. */
+.bt-card__ph {
+  z-index: -2;
+}
+.bt-card__ph .bp__initials {
+  transform: translateY(-12%);
+}
+/* Ivory to beige on a tile, matching the photo tiles (the navy version stays
+   everywhere else). `.bt-card` raises specificity above `.bp`. */
+.bt-card .bt-card__ph {
+  color: rgba(216, 194, 157, 0.35);
+  background:
+    radial-gradient(120% 90% at 85% 10%, rgba(255, 255, 255, 0.85), transparent 60%),
+    linear-gradient(160deg, rgb(var(--bt-ivory)) 0%, var(--bt-beige) 100%);
+}
+.bt-card .bt-card__ph .bp__initials {
+  color: rgba(119, 115, 109, 0.14);
+}
+
+/* "Explore more about {brand}" under the preview: the arrow nudges right. */
+.bt-pvgo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bt-pvgo__arrow {
+  flex: none;
+  transition: transform 0.25s ease;
+}
+.bt-pvgo:hover .bt-pvgo__arrow,
+.bt-pvgo:focus-visible .bt-pvgo__arrow {
+  transform: translateX(4px);
+}
+
+/* Featured (first) card */
+.bt-grid__item--featured .bt-card { padding: 16px; }
+.bt-grid__item--featured .bt-card__glass { padding: 16px 18px; }
+.bt-grid__item--featured .bt-card__name { font-size: 1.8rem; }
+.bt-grid__item--featured .bt-card__cat { font-size: 0.85rem; }
+.bt-grid__item--featured .bt-card__cta { font-size: 0.74rem; }
+.bt-grid__item--featured .bt-card__arrow { width: 40px; height: 40px; }
+ 
+/* ---------- Optional: smooth crossfade for the left preview ----------
+   Only use if the left preview stacks one <img class="bt-preview__img">
+   per brand and toggles .is-active. Skip if you keep your current one. */
+.bt-preview {
+  position: relative;
+  overflow: hidden;
+}
+.bt-preview__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 0.5s ease, transform 1s ease;
+}
+.bt-preview__img.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+ 
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .bt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .bt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 150px;
+  }
+}
+/* Touch screens have no hover: keep photos mostly in focus */
+@media (hover: none) {
+  .bt-card__bg { filter: blur(2px) saturate(0.95); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bt-card,
+  .bt-card__bg,
+  .bt-card__arrow,
+  .bt-card__arrowIcon,
+  .bt-card__ctaRest,
+  .bt-card__ctaHover,
+  .bt-pvgo__arrow,
+  .bt-preview__img { transition: none; }
+  .bt-card:hover { transform: none; }
+}

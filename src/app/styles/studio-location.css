@@ -1,0 +1,165 @@
+/* ================= LOCATION ================= */
+
+.studio-location {
+    padding: 40px 20px;
+    /* No background: the page canvas gradient (globals.css) shows through.
+       Was an opaque warm off-white, which hid the canvas on this route. */
+}
+
+.location-header {
+    text-align: center;
+    max-width: 700px;
+    margin: auto auto 70px;
+}
+
+/* This block already had an eyebrow — a bare <span> in grey. It is the shared
+   .secEyebrow component now, so the rule below would have fought it twice:
+   .location-header span (0,1,1) beats .secEyebrow (0,1,0) AND it matches both
+   inner spans, so the 64px rule line would have been given a font-size and a
+   letter-spacing it has no text to apply them to. Scoped to the label span so
+   the shared component owns the colour, the gap and the rule. */
+.location-header .secEyebrow > span:first-child {
+    letter-spacing: 2.5px;
+}
+
+/* Section-heading treatment, site-wide (owner, 2026-09-17). Was 58px/500/#111
+   — the one section heading on the site already close to this size. */
+.location-header h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    margin: 18px 0;
+    font-weight: 400;
+}
+
+.location-header p {
+    color: #666;
+    line-height: 1.8;
+}
+
+.location-wrapper {
+    max-width: 1300px;
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 40px;
+}
+
+.location-card {
+    background: white;
+    padding: 50px;
+    border-radius: 28px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .06);
+}
+
+.location-card h3 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #111;
+}
+
+.location-card p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.location-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px 28px;
+
+    border-radius: 999px;
+
+    background: #264ea0;
+    color: #fff;
+
+    text-decoration: none;
+    transition: .3s ease;
+}
+
+.location-btn:hover {
+    transform: translateY(-3px);
+}
+
+/* The lift alone barely registered (owner, 2026-10-07): the site's hover
+   blue and soft glow too. Mouse only. */
+@media (hover: hover) {
+    .location-btn:hover {
+        background: var(--primary-dark);
+        box-shadow: 0 8px 18px rgba(38, 78, 160, .22);
+    }
+}
+
+.location-map {
+    overflow: hidden;
+    border-radius: 28px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, .08);
+}
+
+/* Shared box with the consent placeholder.
+
+   BOTH SELECTORS MUST CARRY EVERY HEIGHT, AT EVERY BREAKPOINT. The 768px block
+   below once resized the iframe alone, leaving the placeholder on the 992px
+   height — so on a phone the panel jumped 100px the moment the map loaded,
+   which is the exact drift the shared box rule exists to prevent.
+   Heights: 460 / 400 (<=992) / 320 (<=768), trimmed from 550/450/350 on
+   2026-09-22 (owner) because the panel stood taller than the address card
+   beside it.
+   Original note follows — see the note in footer.css. */
+.location-map iframe,
+.location-map .mapGate {
+    width: 100%;
+    height: 460px;
+}
+
+.location-map iframe {
+    border: none;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 992px) {
+
+    .location-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .location-header h2 {
+        font-size: 42px;
+    }
+
+    .location-map iframe,
+    .location-map .mapGate {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .studio-location {
+        padding: 80px 18px;
+    }
+
+    .location-header h2 {
+        font-size: 34px;
+    }
+
+    .location-card {
+        padding: 30px;
+    }
+
+    .location-map iframe,
+    .location-map .mapGate {
+        height: 320px;
+    }
+}

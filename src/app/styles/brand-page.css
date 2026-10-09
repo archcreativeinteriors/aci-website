@@ -1,0 +1,220 @@
+/* ================= BRAND COLLECTION PAGE =================
+   /projects/brand/[brand] — spec §3: hero · stats · format breakdown · state
+   breakdown · CTA.
+
+   Only 7 of 66 brands reach the §23 threshold (3+ projects), so this stylesheet
+   serves a handful of pages. It stays a separate file rather than joining
+   home.css because the two are edited for different reasons.
+
+   Cards and the grid are NOT here — they are the shared primitives in
+   project-cards.css (§32). */
+
+/* ---- §3.1 hero ---- */
+
+.bhero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--s4);
+    align-items: center;
+    padding: var(--s2) 0 var(--s4);
+}
+
+.bheroKick {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+
+.bhero h1 {
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -.03em;
+}
+
+.bheroLede {
+    margin-top: var(--s2);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 46ch;
+}
+
+/* ---- §4 statistics ---- */
+
+.bstats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+    margin-top: var(--s3);
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border);
+}
+
+.bstatN {
+    font-size: clamp(30px, 3.6vw, 40px);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--primary);
+}
+
+.bstatL {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 6px 0 0;
+}
+
+.bheroImg {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-card);
+    overflow: hidden;
+    background: var(--surface-soft);
+    box-shadow: var(--sh-soft);
+}
+
+/* ---- §5 format breakdown ---- */
+
+.bfmt {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--s4);
+    align-items: start;
+}
+
+.bfmtBars {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bfmtRow {
+    display: grid;
+    grid-template-columns: 120px 1fr 40px;
+    gap: 16px;
+    align-items: center;
+    font-size: 14.5px;
+}
+
+.bfmtLabel {
+    color: var(--muted);
+}
+
+.bfmtTrack {
+    height: 10px;
+    background: var(--surface-soft);
+    border-radius: var(--r-chip);
+    overflow: hidden;
+}
+
+/* Rendered at its true width. No load animation on purpose: the site allows one
+   (the home hero cross-fade), and a second would also mean these bars sit at
+   zero width for anyone the animation never reaches. */
+.bfmtFill {
+    display: block;
+    height: 100%;
+    background: var(--primary);
+    border-radius: var(--r-chip);
+}
+
+.bfmtN {
+    text-align: right;
+    font-weight: 500;
+}
+
+.bfmtCopy p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 44ch;
+}
+
+.bfmtLink {
+    margin-top: var(--s2);
+}
+
+/* ---- §6 state breakdown ---- */
+
+.bstateGroup + .bstateGroup {
+    margin-top: var(--s4);
+}
+
+.bstateHead {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: var(--s2);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.bstateHead small {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+}
+
+/* ---- §3 item 7, CTA ---- */
+
+.bcta {
+    text-align: center;
+}
+
+.bcta h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    line-height: 1.12;
+    max-width: 22ch;
+    margin: 0 auto;
+}
+
+.bcta p {
+    margin-top: 16px;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 52ch;
+    margin-inline: auto;
+}
+
+.bctaActions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-top: var(--s3);
+}
+
+/* ---- breakpoints ---- */
+
+@media (max-width: 1000px) {
+
+    .bhero,
+    .bfmt {
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+    }
+
+    .bhero {
+        padding-bottom: var(--s3);
+    }
+}
+
+@media (max-width: 680px) {
+    .bfmtRow {
+        grid-template-columns: 88px 1fr 32px;
+        gap: 12px;
+        font-size: 13.5px;
+    }
+}

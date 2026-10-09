@@ -1,0 +1,230 @@
+/* ================= /services =================
+   Rebuilt in the site's editorial language (see services/page.js). Everything
+   the old version defined — `.services-hero`, `.service-card`, `.service-left`
+   / `.service-right`, the icon chip, the filled arrow button — is gone with the
+   markup that used it. Nothing else referenced those classes: the detail page
+   uses `.service-features-grid` from service-detail.css, which is a different
+   rule despite the similar name.
+
+   Everything is `svp`-prefixed. All ~30 stylesheets load globally on every
+   route, and the un-prefixed names this file used to own (`.service-icon`,
+   `.feature-item`) already collide with services.css and the project detail
+   page — CLAUDE.md records `.service-icon` having to be scoped once before.
+
+   Section rhythm, gutters and headings come from home.css's shared primitives
+   (`.sec`, `.band`, `.wrapx`, `.link`, `.bWhite`); this file only adds what is
+   specific to the page. */
+
+/* ---- hero ---- */
+
+.svpHero {
+    padding: var(--s3) 0 var(--s4);
+    max-width: 62ch;
+}
+
+.svpKick {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+
+/* Raised from clamp(34px, 5vw, 58px) with the section-heading change: the
+   .svpCta h2 further down this page reaches 63px, so the page title was the
+   smaller of the two. 42/6vw/72 beats the h2 at every width.  */
+.svpHero h1 {
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -.03em;
+    color: var(--text);
+}
+
+.svpLede {
+    margin-top: var(--s2);
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--muted);
+}
+
+/* The header's one headline figure (Site settings → spacesDelivered). It took
+   the place of the per-sector stat strip, so it keeps that strip's hairline and
+   number styling. */
+.svpSpaces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    margin: var(--s3) 0 0;
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border);
+}
+
+.svpSpaces strong {
+    font-size: clamp(28px, 3.4vw, 38px);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--primary);
+}
+
+.svpSpaces span {
+    font-size: 15px;
+    color: var(--muted);
+}
+
+/* ---- one row per service ---- */
+
+.svpRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s4);
+    align-items: center;
+}
+
+/* Alternating sides. The image is FIRST in the DOM either way — reading order
+   stays photo-then-copy for a screen reader and on mobile; only the visual
+   column swaps. */
+.svpRow[data-flip="1"] .svpImg {
+    order: 2;
+}
+
+.svpImg {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-card);
+    overflow: hidden;
+    background: var(--surface-soft);
+    box-shadow: var(--sh-soft);
+}
+
+.svpTag {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.svpTxt h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    color: var(--text);
+}
+
+.svpDesc {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 52ch;
+}
+
+/* A link to the portfolio under each service — deliberately without a number
+   (the owner removed the per-sector counts, 2026-09-24). */
+.svpCount {
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.svpCount a {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s var(--ease);
+}
+
+.svpCount a:hover {
+    border-color: var(--primary);
+}
+
+.svpFeatures {
+    list-style: none;
+    margin: var(--s2) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+}
+
+.svpFeatures li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--text);
+}
+
+.svpFeatures li > svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+    color: var(--primary);
+}
+
+.svpMore {
+    margin-top: var(--s3);
+}
+
+/* ---- closing CTA ---- */
+
+.svpCta {
+    text-align: center;
+}
+
+.svpCta h2 {
+    font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 64px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    color: var(--heading-ink);
+    line-height: 1.12;
+    max-width: 22ch;
+    margin: 0 auto;
+}
+
+.svpCta p {
+    margin-top: 14px;
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 52ch;
+    margin-inline: auto;
+}
+
+.svpCtaActions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-top: var(--s3);
+}
+
+/* ---- breakpoints ---- */
+
+@media (max-width: 1000px) {
+    .svpRow {
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+    }
+
+    /* One column — the flip has nothing to swap, and leaving it set would push
+       the image below the copy on every other row. */
+    .svpRow[data-flip="1"] .svpImg {
+        order: 0;
+    }
+}
+
+@media (max-width: 680px) {
+    .svpHero {
+        padding: var(--s2) 0 var(--s3);
+    }
+
+    .svpFeatures {
+        grid-template-columns: 1fr;
+    }
+}
