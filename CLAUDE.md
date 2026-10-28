@@ -7,7 +7,7 @@ SEO-focused, `en-IN`, no auth. The full history — Phases 1–27, the SEO work 
 of every rule below — is in `docs/archive/CLAUDE.full.md`. Search it before re-deriving anything.
 
 ## Stack
-- Next.js 16.2.4 App Router, React 19.2.4, Node >= 20.9. **Next 16 breaks training-data habits**:
+- Next.js 16.4.2 App Router (upgraded from 16.2.4 on 2026-10-26 for security fixes), React 19.2.4, Node >= 20.9. **Next 16 breaks training-data habits**:
   `params` is a Promise (`const { id } = await params`); read `node_modules/next/dist/docs/` first.
 - JavaScript / JSX only — keep new files `.js`/`.jsx`. Next reads `tsconfig.json` (so `jsconfig.json`
   and its `@/*` alias are inert); nothing uses `@/`, imports are relative.
@@ -59,16 +59,35 @@ sanity/             the Studio: schemas/, scripts/backup.mjs
 archive/            everything moved out in Phase 6 (old local content, images, tools) — not deleted
 sanity.config.js, sanity.cli.js   must stay at the repo root (the CLI resolves config from cwd)
 scripts/            asset / data generators
-docs/               SESSION_HANDOFF.md, PRODUCTION-READINESS-REPORT.txt, archive/
+docs/               HANDOFF.md (current state + open decisions — read it), vercel-deploy.md,
+                    project-photos-plan.md, project-field-map.md; SESSION_HANDOFF.md and
+                    PRODUCTION-READINESS-REPORT.txt are September history (VPS era); archive/
 ```
 Project photos come from the owner's folders via `npm run photos:upload` (straight to Sanity) or
 are added in the Studio. Nothing content-like is kept in the repo.
 
 ## Standing rules
-- **Never commit, push or deploy unless the owner asks.** Work on branches.
-- **Never print `RESEND_API_KEY` or any `.env.local` value.** The key is live and unrotated.
+These apply to every agent working here, not only Claude (AGENTS.md points here).
+- **Never commit, push, merge or deploy unless the owner asks.** Work on branches; do not merge
+  anything until the owner says so.
+- **Never delete anything.** A file that is no longer wanted moves to `archive/` at the same path
+  (e.g. `src/app/styles/x.css` → `archive/src/app/styles/x.css`).
+- **Never print `RESEND_API_KEY` or any `.env.local` value.** The key is live and unrotated. Do not
+  edit or copy `.env.local` either; list variable NAMES only.
+- **Do not touch `C:\dev\arch-creative-website`** (the previous site's code), nor `node_modules/`,
+  `.next/` or `.sanity/`.
 - **Port 3000 is the owner's IDE dev server — never kill it.** Run production checks on 3100
   (`npx next start -p 3100`) and confirm `curl -s localhost:3100/ | grep -c next-devtools` is `0`.
+  Stop such a test server only by matching its command line (`*next*start -p 3100*`). Build
+  checks into a separate folder (`NEXT_DIST_DIR=.next-build`) so the dev server's `.next` is left
+  alone — Next then appends `.next-build/types` lines to `tsconfig.json`; never commit those.
+- **Git** (2026-10-09): the repo is `github.com/archcreativeinteriors/aci-website`. Its `main` is a
+  single fresh commit (no old history) pushed from the local branch `new-main`, which tracks
+  `origin/main` — **work from `new-main`**. The 11 older local branches (`page-titles-descriptions`,
+  `main`, `perf/*`, …) carry the previous account's history and ~250 MB of old photos: **never
+  push them, and never `git push --all`.** This repo commits as "Arch Creative Interiors"
+  (repo-local `user.name` / `user.email`), and its remote URL names the `archcreativeinteriors`
+  user so Git signs in with that GitHub account.
 - **Sanity content goes live on its own** (owner, 2026-10-01; it was "only on a rebuild"): every
   Sanity answer is cached under the tag `sanity` with a 1-hour fallback (`lib/content/sanity.js`),
   and the Sanity webhook → `POST /api/revalidate` (signed with `SANITY_REVALIDATE_SECRET`) marks
@@ -88,13 +107,15 @@ are added in the Studio. Nothing content-like is kept in the repo.
 - **No dot in a Sanity document `_id`.** A dotted id is PRIVATE: the Studio shows it, the site's
   public reads never see it. Use `<type>-<slug>` (projects: `project-<listNo>`).
 - **No writes to Sanity** (`--apply`, `sanity deploy`, dataset import) without the owner's OK.
-  `.git` is 259 MB of old images: keep photos out of the repo. (If history is ever rewritten,
-  any existing clone must be re-cloned; Vercel clones fresh on each deploy.)
+  Test any workflow on the `staging` dataset first — never on production while testing.
+  `npm run photos:upload -- --apply` writes to whatever `NEXT_PUBLIC_SANITY_DATASET` says
+  (production in `.env.local`); it does not ask for `--dataset`, so pass it deliberately.
+  Keep photos out of the repo: the pushed history is ~23 MB and should stay small.
 - **`npm run build` does not exercise `scripts/` or `sanity/scripts/`.** After touching one,
   run it (dry run) before relying on it.
 - **A `staging` dataset exists** (copy of production, 2026-09-28) for testing changes before
   production: build against it with `NEXT_PUBLIC_SANITY_DATASET=staging`.
-- Write real commit messages (the history is all "add").
+- Write real commit messages (the old history was all "add"); one topic per commit.
 - Owner decisions — don't reverse them: no GA4; keep `@vercel/analytics` mounted (behind consent);
   CTAs and the floating buttons stay as they are; the project TOTAL appears nowhere on the site (nor
   any share-of-total %), and state pages show no counts; real locations only; the three phone
@@ -123,7 +144,9 @@ are added in the Studio. Nothing content-like is kept in the repo.
   `reviewRating` / `aggregateRating`; FAQPage only where the FAQ is visible (`/about`). No
   `Review` nodes at all (2026-10-09): the testimonials review this business itself, which
   Google excludes as self-serving.
-- **Legacy redirects** (`next.config.mjs`, 2026-10-09): 17 project URLs of the previous live site
+- **Legacy redirects** (`next.config.mjs`): `/services/salon|residential|commercial` → `/services#<slug>`
+  (2026-10-27 — the detail pages were folded into /services; file in `archive/src/app/services/`), and
+  (2026-10-09) 17 project URLs of the previous live site
   whose slug changed are 308'd to the matching page. Never remove them, and never rename a
   project slug in the Studio without adding a redirect the same way.
 - NAP: address, hours, email and phones all from `getSiteSettings()`; never hard-code any of them.
@@ -152,8 +175,8 @@ are added in the Studio. Nothing content-like is kept in the repo.
   `RESEND_API_KEY`; confirm a contact-form test email arrives; 18 clean photographs (the rest
   carry a trial watermark); confirm 24-month retention; Grievance Officer's name; approve FAQ
   additions; two guessed logo names (`ps`, `rain`); legal review of `/privacy-policy`, `/terms`.
-- **Code:** `next` 16.2.4 is in a vulnerable range (upgrade ≥16.3.4, GHSA-2xp9-vwfh-vxw4 —
-  AVIF is enabled); no security headers in `next.config.mjs` (there is no nginx on Vercel —
+- **Code:** `next` upgraded to 16.4.2 on 2026-10-26 (`npm audit --omit=dev`: 0 vulnerabilities;
+  the Studio dev tooling still has some, owner to decide); no security headers in `next.config.mjs` (there is no nginx on Vercel —
   add them in `next.config.mjs` before launch); no
   `global-error.js`; no `engines` field; the site email (Site settings) is a Gmail address;
   `CONTACT_FROM` is not a verified domain. With the project ID set, a Sanity outage during a

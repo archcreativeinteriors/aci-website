@@ -20,7 +20,7 @@ Content goes live only after a rebuild and restart: `npm run build:safe`, then `
 | Projects (list, brand and state collections, map, brand wall, counts) | `project` (Projects / Projects by brand) | `PROJECT_ROWS` | `getProjectRows()`, `getProjects()`, `getStats()`, `getLocations()` | /, /projects, /projects/brand/[brand], /projects/state/[state], layout (areaServed), sitemap |
 | One project page | `project` with Status = "published" | `PROJECT_BY_SLUG` | `getProjectPage(slug)`, `getProjectPageIds()` | /projects/[id], sitemap |
 | Brands | `brand` (Brands). Names reach the site through each project's **Brand** reference. A brand with no project has no page. | (inside `PROJECT_ROWS`: `brand->name`) | `getStats().brandsByCount()` | brand wall, brand pages, project pages |
-| Services | `service` (Services) | `SERVICES` | `getServices()`, `getService(slug)` | /services, /services/[slug], sitemap |
+| Services | `service` (Services) | `SERVICES` | `getServices()`, `getService(slug)` | /services (one section per service; the /services/[slug] pages were folded in, 2026-10-27) |
 | About intro and process stages | `aboutPage`, a singleton (About page) | `ABOUT_PAGE` | `getAboutPage()` | /about |
 | Founder | `founder`, a singleton (Founder) | `FOUNDER` | `getFounder()` | /about, / (StudioBlock) |
 | Team | `teamMember` (Team) | `TEAM` | `getTeam()` | /about |
