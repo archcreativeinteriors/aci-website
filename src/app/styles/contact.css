@@ -380,3 +380,14 @@
         gap: 14px;
     }
 }
+/* /services "Customise your …" links land on /contact?type=…#contact-form —
+   clear the fixed header (same offsets as #main-content in globals.css). */
+#contact-form {
+    scroll-margin-top: 104px;
+}
+
+@media (max-width: 767px) {
+    #contact-form {
+        scroll-margin-top: 72px;
+    }
+}

@@ -1,4 +1,5 @@
-// The service lines — /services, /services/[slug] and the sitemap.
+// The service lines — the sections of /services (the /services/[slug] detail
+// pages were folded into it on 2026-10-27; see archive/src/app/services/).
 
 import { cache } from "react";
 import { sanityFetch, required } from "./sanity";

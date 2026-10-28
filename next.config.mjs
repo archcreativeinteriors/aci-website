@@ -109,6 +109,15 @@ const nextConfig = {
         ["geetanjali-studio-ajmer", "/projects/geetanjali-studio-ajmer-rajasthan"],
         ["geetanjali-studio-rajendra-nagar", "/projects/geetanjali-studio-rajendra-nagar-dehradun"],
       ].map(([from, destination]) => ({ source: `/projects/${from}`, destination, permanent: true })),
+      // The three service detail pages were folded into /services (owner,
+      // 2026-10-27; the page file is in archive/src/app/services/[slug]/). Each
+      // old URL — indexed on the live site — lands on its own section there.
+      // Never remove these.
+      ...["salon", "residential", "commercial"].map((slug) => ({
+        source: `/services/${slug}`,
+        destination: `/services#${slug}`,
+        permanent: true,
+      })),
     ];
   },
   async rewrites() {

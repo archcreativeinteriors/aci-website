@@ -7,7 +7,8 @@ import JsonLd from "../../components/JsonLd";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import { articleJsonLd, breadcrumbJsonLd } from "../../lib/jsonld";
 
-// Title shown in the end-of-post CTA per services/[slug] slug.
+// Title shown in the end-of-post CTA per service slug. The link goes to that
+// service's section on /services (the detail pages were folded in, 2026-10-27).
 const SERVICE_TITLES = {
   salon: "Salon Interiors",
   residential: "Residential Interiors",
@@ -108,7 +109,7 @@ export default async function BlogPage({ params }) {
             <h3>{`Ready to start your ${blog.category.replace(" Design", "").toLowerCase()} project?`}</h3>
             <p>Talk to our design team and get a free consultation.</p>
             <div className="blog-cta-actions">
-              <Link href={`/services/${blog.relatedService}`} className="blog-cta-btn">
+              <Link href={`/services#${blog.relatedService}`} className="blog-cta-btn">
                 {`Explore ${SERVICE_TITLES[blog.relatedService] || "Our Services"}`}
               </Link>
               <Link href="/contact" className="blog-cta-btn blog-cta-btn-outline">

@@ -1,12 +1,11 @@
 import { SITE_URL } from "./lib/site";
-import { getBlogs, getServices, getStats, getProjectPageIds, brandSlug, stateSlug, isBrandIndexable } from "./lib/content";
+import { getBlogs, getStats, getProjectPageIds, brandSlug, stateSlug, isBrandIndexable } from "./lib/content";
 
 export default async function sitemap() {
   // Everything from Sanity (lib/content) — the same lists the pages build
   // from, so every URL here has a page.
-  const [blogs, services, stats, projectIds] = await Promise.all([
+  const [blogs, stats, projectIds] = await Promise.all([
     getBlogs(),
-    getServices(),
     getStats(),
     getProjectPageIds(),
   ]);
@@ -29,11 +28,9 @@ export default async function sitemap() {
     { url: "/terms", changeFrequency: "yearly", priority: 0.2 },
   ].map((r) => ({ ...r, url: `${SITE_URL}${r.url}` }));
 
-  const serviceRoutes = services.map((service) => ({
-    url: `${SITE_URL}/services/${service.slug}`,
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
+  // No /services/<slug> URLs any more: the three detail pages were folded into
+  // /services (owner, 2026-10-27) and the old URLs redirect to its sections
+  // (next.config.mjs).
 
   // Brand collection pages. Only brands at the §23 threshold (3+ projects)
   // HAVE a page — listing all 66 here would advertise 59 URLs that 404.
@@ -75,7 +72,6 @@ export default async function sitemap() {
 
   return [
     ...staticRoutes,
-    ...serviceRoutes,
     ...brandRoutes,
     ...stateRoutes,
     ...projectRoutes,

@@ -1,8 +1,12 @@
 "use client";
 
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+// The options of the Project type select — the same three the API accepts
+// (api/contact/route.js).
+const PROJECT_TYPES = ["Residential", "Commercial", "Salon"];
 
 export default function Contact() {
 
@@ -21,6 +25,16 @@ export default function Contact() {
         // they have already pressed.
         consent: false,
     });
+
+    // /services sends "Customise your …" here as /contact?type=salon (or
+    // residential / commercial) — preselect that Project type. Read after
+    // mount, so the server render and the first client render stay identical
+    // (the page is static) and an unknown value is simply ignored.
+    useEffect(() => {
+        const wanted = new URLSearchParams(window.location.search).get("type");
+        const match = PROJECT_TYPES.find((t) => t.toLowerCase() === (wanted || "").toLowerCase());
+        if (match) setForm((f) => (f.projectType ? f : { ...f, projectType: match }));
+    }, []);
 
     const handleChange = (e) => {
         // A checkbox reports its state on .checked; .value is the literal "on"

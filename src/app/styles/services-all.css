@@ -228,3 +228,275 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================================
+   Detailed sections (owner, 2026-10-27) — the /services/<slug>
+   detail pages were folded into this page. Jump bar, the
+   "What's included / How we work" tabs (components/
+   ServiceTabs.jsx), the per-section buttons and the recent
+   work strip. The previous stylesheet is in
+   archive/src/app/styles/services-all.before-detailed-sections.css.
+   ========================================================= */
+
+/* Old /services/<slug> URLs redirect to #salon / #residential / #commercial;
+   the fixed header must not cover the section's top. Same offsets as
+   #main-content (globals.css). */
+.svpSec {
+    scroll-margin-top: 104px;
+}
+
+/* ---- jump bar ---- */
+.svpJump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: var(--s3);
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border);
+}
+
+.svpJumpLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-btn);
+    background: #fff;
+    color: var(--text);
+    font-size: 14px;
+    text-decoration: none;
+    transition: border-color .3s var(--ease), color .3s var(--ease),
+        transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.svpJumpLink svg {
+    color: var(--primary);
+}
+
+.svpJumpLink:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+/* ---- photo label ---- */
+.svpImgLabel {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 8px 14px;
+    border-radius: var(--r-chip);
+    background: rgba(255, 255, 255, .9);
+    backdrop-filter: blur(6px);
+    color: var(--heading-ink);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .02em;
+}
+
+/* The photo zooms a touch while the section is hovered. Mouse only. */
+.svpImg img {
+    transition: transform .8s var(--ease);
+}
+
+/* ---- tabs ---- */
+.svpTabs {
+    margin-top: var(--s2);
+}
+
+.svpTabList {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-btn);
+    background: var(--surface-soft);
+}
+
+.svpTab {
+    font: inherit;
+    font-size: 13.5px;
+    line-height: 1.2;
+    padding: 9px 16px;
+    border: 0;
+    border-radius: var(--r-btn);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background-color .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.svpTab.on {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--sh-mid);
+}
+
+.svpTab:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.svpPanel {
+    margin-top: 18px;
+}
+
+.svpPanel .svpFeatures {
+    margin-top: 0;
+}
+
+/* without JavaScript both panels show; keep them apart */
+.svpPanel + .svpPanel {
+    margin-top: 18px;
+}
+
+/* process steps — a numbered sequence */
+.svpSteps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+    counter-reset: none;
+}
+
+.svpSteps li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: var(--text);
+}
+
+.svpStepN {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+/* a hairline joining the step numbers */
+.svpSteps li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 34px;
+    width: 1px;
+    height: 10px;
+    background: var(--border);
+}
+
+/* ---- buttons ---- */
+.svpActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px var(--s2);
+    margin-top: var(--s3);
+}
+
+/* ---- recent work ---- */
+.svpWork {
+    margin-top: var(--s4);
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border);
+}
+
+.svpWorkHead {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: var(--s2);
+}
+
+@media (hover: hover) {
+    .svpJumpLink:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px -6px rgba(38, 78, 160, .35);
+    }
+
+    .svpSec:hover .svpImg img {
+        transform: scale(1.03);
+    }
+
+    .svpTab:not(.on):hover {
+        color: var(--primary);
+        background: #fff;
+    }
+}
+
+/* fewer than four (Commercial has three brands with photos today): fill the
+   row with equal columns instead of leaving an empty slot */
+.svpWorkGrid[data-n="3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.svpWorkGrid[data-n="2"],
+.svpWorkGrid[data-n="1"] {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 50%;
+}
+
+@media (max-width: 1000px) {
+    /* four cards: two rows of two, not three and an orphan; three stay a row */
+    .svpWorkGrid:not([data-n="3"]) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .svpWork {
+        margin-top: var(--s3);
+    }
+}
+
+@media (max-width: 767px) {
+    .svpSec {
+        scroll-margin-top: 72px;
+    }
+}
+
+@media (max-width: 680px) {
+    .svpWorkGrid[data-n] {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: none;
+    }
+
+    .svpTabList {
+        display: flex;
+    }
+
+    .svpTab {
+        flex: 1;
+        padding: 9px 10px;
+    }
+
+    .svpImgLabel {
+        left: 12px;
+        bottom: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .svpJumpLink,
+    .svpTab,
+    .svpImg img {
+        transition: none;
+    }
+
+    .svpSec:hover .svpImg img {
+        transform: none;
+    }
+}

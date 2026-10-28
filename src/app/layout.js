@@ -20,7 +20,6 @@ import "./styles/footer.css"
 import "./styles/projects.css"
 import "./styles/costing.css"
 import "./styles/services-all.css"
-import "./styles/service-detail.css"
 import "./styles/project-cards.css";
 import "./styles/brand-page.css";
 import "./styles/project-detail.css"
