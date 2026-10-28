@@ -124,3 +124,22 @@
         transition: none;
     }
 }
+
+/* Static labels (owner, 2026-10-21): the chips are text, not controls — no
+   pointer, no hover border, lift, glow or colour change. Later in the file and
+   one class more specific than the hover rules above, so these win. */
+.pf-tag {
+    cursor: default;
+}
+
+.pf-tag:not(.on):hover {
+    border-color: var(--border);
+}
+
+@media (hover: hover) {
+    .pf-tag:not(.on):hover {
+        color: var(--text);
+        transform: none;
+        box-shadow: none;
+    }
+}

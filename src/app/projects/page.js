@@ -83,14 +83,13 @@ export default async function ProjectsPage() {
 
                     {/* The rows below are plain server-rendered links and are
                         complete without JavaScript. ProjectIndex layers the
-                        cursor-following preview on top and ProjectFilters only
-                        hides rows — if neither bundle loads you lose the photo
-                        and the chips, not the page (see Phase 10.11). */}
+                        cursor-following preview on top — if its bundle does not
+                        load you lose the photo, not the page (see Phase 10.11).
+                        ProjectFilters is now static sector LABELS, not filters
+                        (owner, 2026-10-21): every row always shows. */}
                     {/* `total` and each option's `count` are still passed, but
                         neither is RENDERED — no project counts on the site
-                        (owner, 2026-10-01). The counts order the chips here;
-                        ProjectFilters names the active filter instead of
-                        counting it. */}
+                        (owner, 2026-10-01). The counts order the labels. */}
                     <ProjectFilters
                         options={filterOptions}
                         total={PROJECT_STATS.projects}
