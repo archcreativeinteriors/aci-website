@@ -50,9 +50,19 @@ import CtaBand from "./components/home/CtaBand";
 export async function generateMetadata() {
   const { stats } = await getSiteSettings();
   return {
-    title: "Salon & Commercial Interior Designers, Delhi NCR",
-    // No city / state counts either (owner, 2026-10-01).
-    description: `Salon, commercial and residential interior designers in Delhi NCR, working in cities across India — design, execution and handover.`,
+    // Owner-approved 2026-10-28. Keeps "salon" (169 of 174 published projects),
+    // "interior designers" (the search term) and "Delhi NCR" (the Gurugram
+    // studio's local signal); "turnkey" is in the description and the hero.
+    //
+    // `absolute`, with the brand written ONCE: layout.js's title template
+    // (" | Arch Creative Interiors") applies only to routes BELOW the root
+    // layout, never to this page in the same segment — measured 2026-10-28,
+    // the home title had been printing with no brand at all. Every other page
+    // still gets the suffix from the template.
+    title: { absolute: "Salon & Commercial Interior Designers, Delhi NCR | Arch Creative Interiors" },
+    // No numbers (owner, 2026-10-01). Every sector named here is one the site
+    // offers on /services.
+    description: `Turnkey interior design from a Gurugram studio: salons, showrooms, restaurants, offices and homes across Delhi NCR and India, from design to handover.`,
     alternates: { canonical: "/" },
     openGraph: {
       title: "Arch Creative Interiors — Salon & Commercial Interior Designers",
